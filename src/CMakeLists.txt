@@ -17,6 +17,7 @@
 
 set( SOURCES
   main.cpp
+  pipeline.cpp
   )
 
 add_executable( ${PROJECT_NAME} ${SOURCES} )
