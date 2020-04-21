@@ -17,8 +17,24 @@
 
 #include <cstdlib>
 
+
+#include "pipeline.hpp"
+
+
+#define unused( x )
+
 int
-main( int argc, char * argv[] )
+main( int unused( argc ), char * unused( argv )[] )
 {
+    // using ifr_ptr_type = std::shared_ptr< image_file_reader >;
+    // using ifw_otr_type = std::shared_ptr< image_file_writer >;
+
+    std::shared_ptr< image_file_reader > ifr;
+    std::shared_ptr< image_file_writer > ifw;
+    std::shared_ptr< ndvi_filter > ndvi;
+
+    std::get< 0 >( ifw->in ).source = ndvi;
+    std::get< 0 >( ndvi->in ).source = ifr;
+
     return EXIT_SUCCESS;
 }
