@@ -21,6 +21,7 @@
 #include <cassert>
 #include <memory>
 #include <stdexcept>
+#include <tuple>
 
 struct data
 {
@@ -59,41 +60,46 @@ struct in_port
 {
   using value_type = T;
 
-  using pointer_type = std::weak_ptr< process >;
-
-  pointer_type source;
-};
-
-
-template< typename T >
-struct out_port
-{
-  using value_type = T;
-
-  out_port( process * p ) : process( p ) {}
+  // using pointer_type = std::weak_ptr< process >;
 
   process * source;
   T data;
 };
 
 
+template< typename Data >
+struct out_port
+{
+  using value_type = Data;
+
+  out_port( process * p ) : source( p ) {}
+
+  process * source;
+  Data data;
+};
+
+
+template< typename Data >
+using port = out_port< Data >;
+
+
 // template< typename ... T >
-// using input = std::tuple< in_port< T > ... >;
+// using output = std::tuple< port< T > ... >;
+
 
 template< typename ... T >
 struct output
 {
-  // template< typename T >
-  // using port_ptr_type = std::shared_ptr< T >;
-
   output( process * p ) : data( out_port< T >( p ) ...  ) {}
 
-  std::tuple< out_port< T > ... > data;
+  using value_type = std::tuple< out_port< T > ... >;
+
+  value_type data;
 };
 
 
 template< typename ... T >
-using input = std::tuple< in_port< T > ... >;
+using input = std::tuple< port< T > * ... >;
 
 // template< typename ... T >
 // struct input
@@ -101,19 +107,36 @@ using input = std::tuple< in_port< T > ... >;
 //     std::tuple< T ... > data;
 // };
 
+
 template< typename Out >
 struct in_process : public virtual process
 {
   in_process() : out( this ) {}
 
+  template< std::size_t I >
+  auto &
+  output() noexcept
+    {
+      return std::get< I >( out.data );
+    }
+
   Out out;
 };
+
 
 template< typename In >
 struct out_process : public virtual process
 {
+  template< std::size_t I >
+  auto &
+  input() noexcept
+    {
+      return std::get< I >( in );
+    }
+
   In in;
 };
+
 
 template< typename In,
 	  typename Out >
@@ -122,16 +145,17 @@ struct filter : public in_process< Out >,
 {
 };
 
-struct information
+// struct information
+// {
+// };
+
+template< typename ... Outputs >
+struct reader : public in_process< output< Outputs ... > >
 {
 };
 
-template< typename Out >
-struct reader : public in_process< Out >
-{
-};
-
-struct writer
+template< typename ... Inputs >
+struct writer : public out_process< input< Inputs ... > >
 {
 };
 
@@ -141,18 +165,39 @@ struct image : public data
 };
 
 
-struct image_file_reader : public in_process< output< image > >
+struct image_file_reader : public reader< image >
 {
 };
 
 
-struct image_file_writer : public out_process< input< image > >
+struct image_file_writer : public writer< image >
 {
 };
 
 
 struct ndvi_filter : public filter< input< image >,
 				    output< image > >
+{
+};
+
+
+struct point_cloud : public data
+{
+};
+
+
+struct las_file_reader : public reader< point_cloud >
+{
+};
+
+
+struct las_file_writer : public writer< point_cloud >
+{
+};
+
+
+struct point_cloud_algorithm : public filter< input< point_cloud >,
+					      output< point_cloud > >
 {
 };
 
