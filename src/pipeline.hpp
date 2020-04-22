@@ -86,7 +86,12 @@ namespace pipeline
     {
       using value_type = Data;
 
-      out_port( process * p ) : source( p ) {}
+      out_port( process * p ) : source( p )
+	{
+	  assert( source );
+	  if( !source )
+	    throw std::invalid_argument( "unexpected nullptr source." );
+	}
 
       using source_type = cxx::raw_ptr< process >;
 
