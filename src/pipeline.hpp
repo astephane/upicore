@@ -67,32 +67,36 @@ namespace pipeline
 // };
 
 
-  template< typename T >
-  struct in_port
+  // template< typename T >
+  // struct in_port
+  // {
+  //   using value_type = T;
+
+  //   // using pointer_type = std::weak_ptr< process >;
+
+  //   process * source;
+  //   T data;
+  // };
+
+
+  namespace details
   {
-    using value_type = T;
+    template< typename Data >
+    struct out_port
+    {
+      using value_type = Data;
 
-    // using pointer_type = std::weak_ptr< process >;
+      out_port( process * p ) : source( p ) {}
 
-    process * source;
-    T data;
-  };
+      using source_type = cxx::raw_ptr< process >;
 
+      source_type source;
+      Data data;
+    };
+  } // end of details.
 
   template< typename Data >
-  struct out_port
-  {
-    using value_type = Data;
-
-    out_port( process * p ) : source( p ) {}
-
-    process * source;
-    Data data;
-  };
-
-
-  template< typename Data >
-  using port = out_port< Data >;
+  using port = details::out_port< Data >;
 
 
 // template< typename ... T >
@@ -102,9 +106,9 @@ namespace pipeline
   template< typename ... T >
   struct output
   {
-    output( process * p ) : data( out_port< T >( p ) ...  ) {}
+    output( process * p ) : data( port< T >( p ) ...  ) {}
 
-    using value_type = std::tuple< out_port< T > ... >;
+    using value_type = std::tuple< port< T > ... >;
 
     value_type data;
   };
