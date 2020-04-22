@@ -86,16 +86,18 @@ namespace pipeline
     {
       using value_type = Data;
 
-      out_port( process * p ) : source( p )
+      // using source_pointer_type = std::weak_ptr< process >;
+      using source_pointer_type = cxx::raw_ptr< process >;
+
+      out_port( source_pointer_type s ) : source( s )
 	{
 	  assert( source );
+
 	  if( !source )
 	    throw std::invalid_argument( "unexpected nullptr source." );
 	}
 
-      using source_type = cxx::raw_ptr< process >;
-
-      source_type source;
+      source_pointer_type source;
       Data data;
     };
   } // end of details.
@@ -111,7 +113,9 @@ namespace pipeline
   template< typename ... T >
   struct output
   {
-    output( process * p ) : data( port< T >( p ) ...  ) {}
+    using source_pointer_type = typename port< T ... >::source_pointer_type;
+
+    output( source_pointer_type p ) : data( port< T >( p ) ...  ) {}
 
     using value_type = std::tuple< port< T > ... >;
 
