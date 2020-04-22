@@ -22,15 +22,27 @@
 #include <memory>
 #include <stdexcept>
 #include <tuple>
+#include <type_traits>
 
-struct data
+
+namespace cxx
 {
-};
+  template< typename T >
+  using raw_ptr = std::add_pointer_t< T >;
+} // end of namespace cxx.
 
 
-struct process
+namespace pipeline
 {
-};
+
+  struct data
+  {
+  };
+
+
+  struct process
+  {
+  };
 
 
 // template< typename T >
@@ -55,51 +67,51 @@ struct process
 // };
 
 
-template< typename T >
-struct in_port
-{
-  using value_type = T;
+  template< typename T >
+  struct in_port
+  {
+    using value_type = T;
 
-  // using pointer_type = std::weak_ptr< process >;
+    // using pointer_type = std::weak_ptr< process >;
 
-  process * source;
-  T data;
-};
-
-
-template< typename Data >
-struct out_port
-{
-  using value_type = Data;
-
-  out_port( process * p ) : source( p ) {}
-
-  process * source;
-  Data data;
-};
+    process * source;
+    T data;
+  };
 
 
-template< typename Data >
-using port = out_port< Data >;
+  template< typename Data >
+  struct out_port
+  {
+    using value_type = Data;
+
+    out_port( process * p ) : source( p ) {}
+
+    process * source;
+    Data data;
+  };
+
+
+  template< typename Data >
+  using port = out_port< Data >;
 
 
 // template< typename ... T >
 // using output = std::tuple< port< T > ... >;
 
 
-template< typename ... T >
-struct output
-{
-  output( process * p ) : data( out_port< T >( p ) ...  ) {}
+  template< typename ... T >
+  struct output
+  {
+    output( process * p ) : data( out_port< T >( p ) ...  ) {}
 
-  using value_type = std::tuple< out_port< T > ... >;
+    using value_type = std::tuple< out_port< T > ... >;
 
-  value_type data;
-};
+    value_type data;
+  };
 
 
-template< typename ... T >
-using input = std::tuple< port< T > * ... >;
+  template< typename ... T >
+  using input = std::tuple< port< T > * ... >;
 
 // template< typename ... T >
 // struct input
@@ -108,96 +120,98 @@ using input = std::tuple< port< T > * ... >;
 // };
 
 
-template< typename Out >
-struct in_process : public virtual process
-{
-  in_process() : out( this ) {}
+  template< typename Out >
+  struct in_process : public virtual process
+  {
+    in_process() : out( this ) {}
 
-  template< std::size_t I >
-  auto &
-  output() noexcept
-    {
-      return std::get< I >( out.data );
-    }
+    template< std::size_t I >
+    auto &
+    output() noexcept
+      {
+	return std::get< I >( out.data );
+      }
 
-  Out out;
-};
-
-
-template< typename In >
-struct out_process : public virtual process
-{
-  template< std::size_t I >
-  auto &
-  input() noexcept
-    {
-      return std::get< I >( in );
-    }
-
-  In in;
-};
+    Out out;
+  };
 
 
-template< typename In,
-	  typename Out >
-struct filter : public in_process< Out >,
-		public out_process< In >
-{
-};
+  template< typename In >
+  struct out_process : public virtual process
+  {
+    template< std::size_t I >
+    auto &
+    input() noexcept
+      {
+	return std::get< I >( in );
+      }
+
+    In in;
+  };
+
+
+  template< typename In,
+	    typename Out >
+  struct filter : public in_process< Out >,
+		  public out_process< In >
+  {
+  };
 
 // struct information
 // {
 // };
 
-template< typename ... Outputs >
-struct reader : public in_process< output< Outputs ... > >
-{
-};
+  template< typename ... Outputs >
+  struct reader : public in_process< output< Outputs ... > >
+  {
+  };
 
-template< typename ... Inputs >
-struct writer : public out_process< input< Inputs ... > >
-{
-};
+  template< typename ... Inputs >
+  struct writer : public out_process< input< Inputs ... > >
+  {
+  };
 
-
-struct image : public data
-{
-};
+} // end of pipeline.
 
 
-struct image_file_reader : public reader< image >
-{
-};
-
-
-struct image_file_writer : public writer< image >
+struct image : public pipeline::data
 {
 };
 
 
-struct ndvi_filter : public filter< input< image >,
-				    output< image > >
+struct image_file_reader : public pipeline::reader< image >
 {
 };
 
 
-struct point_cloud : public data
+struct image_file_writer : public pipeline::writer< image >
 {
 };
 
 
-struct las_file_reader : public reader< point_cloud >
+struct ndvi_filter : public pipeline::filter< pipeline::input< image >,
+					      pipeline::output< image > >
 {
 };
 
 
-struct las_file_writer : public writer< point_cloud >
+struct point_cloud : public pipeline::data
 {
 };
 
 
-struct point_cloud_algorithm : public filter< input< point_cloud >,
-					      output< point_cloud > >
+struct las_file_reader : public pipeline::reader< point_cloud >
+{
+};
+
+
+struct las_file_writer : public pipeline::writer< point_cloud >
+{
+};
+
+
+struct point_cloud_algorithm : public pipeline::filter< pipeline::input< point_cloud >,
+							pipeline::output< point_cloud > >
 {
 };
 
