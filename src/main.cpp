@@ -23,18 +23,37 @@
 
 #define unused( x )
 
+
+void
+image_pipeline()
+{
+  // using ifr_ptr_type = std::shared_ptr< image_file_reader >;
+  // using ifw_otr_type = std::shared_ptr< image_file_writer >;
+
+  image_file_reader ifr;
+  image_file_writer ifw;
+  ndvi_filter ndvi;
+
+  ifw.input< 0 >() = &ndvi.output< 0 >();
+  ndvi.input< 0 >() = &ifr.output< 0 >();
+}
+
+
+void
+point_cloud_pipeline()
+{
+  las_file_reader lfr;
+  las_file_writer lfw;
+  point_cloud_algorithm pca;
+
+  lfw.input< 0 >() = &pca.output< 0 >();
+  pca.input< 0 >() = &lfr.output< 0 >();
+}
+
+
 int
 main( int unused( argc ), char * unused( argv )[] )
 {
-    // using ifr_ptr_type = std::shared_ptr< image_file_reader >;
-    // using ifw_otr_type = std::shared_ptr< image_file_writer >;
 
-    std::shared_ptr< image_file_reader > ifr;
-    std::shared_ptr< image_file_writer > ifw;
-    std::shared_ptr< ndvi_filter > ndvi;
-
-    std::get< 0 >( ifw->in ).source = ndvi;
-    std::get< 0 >( ndvi->in ).source = ifr;
-
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
