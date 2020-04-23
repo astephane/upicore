@@ -19,6 +19,7 @@
 
 
 #include <cassert>
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <tuple>
@@ -42,6 +43,7 @@ namespace pipeline
 
   struct process
   {
+    virtual ~process() = default;
   };
 
 
@@ -79,6 +81,12 @@ namespace pipeline
   // };
 
 
+
+  template< typename In > class  out_process;
+  template< typename Out > class in_proces;
+  template< typename In, typename Out > class filter;
+
+
   namespace details
   {
     template< typename Data >
@@ -99,11 +107,27 @@ namespace pipeline
 
       source_pointer_type source;
       Data data;
+
+      template< typename In > friend class in_process;
+
+    // private:
+    //   struct data
+    //   {
+    // 	data( std::weak_ptr< out_port > op ) {}
+
+    // 	source_pointer_type source;
+    // 	Data data;
+    //   };
     };
   } // end of details.
 
+
   template< typename Data >
   using port = details::out_port< Data >;
+
+
+  // template< typename Data >
+  // using port_pointer_type = std::shared_ptr< port< Data > >;
 
 
 // template< typename ... T >
@@ -115,16 +139,26 @@ namespace pipeline
   {
     using source_pointer_type = typename port< T ... >::source_pointer_type;
 
-    output( source_pointer_type p ) : data( port< T >( p ) ...  ) {}
+    output( source_pointer_type p ) : data( std::make_shared< port< T > >( p ) ...  ) {}
 
-    using value_type = std::tuple< port< T > ... >;
+    using value_type = std::tuple< std::shared_ptr< port< T > > ... >;
 
     value_type data;
+
+  private:
+    void detach() noexcept
+      {
+	std::apply(
+	  []( auto && ... port ) {
+	    ( ( assert( port ), std::cout << port << std::endl, port->source = nullptr ), ... );
+	  },
+	  data );
+      }
   };
 
 
   template< typename ... T >
-  using input = std::tuple< port< T > * ... >;
+  using input = std::tuple< std::shared_ptr< port< T > > * ... >;
 
 // template< typename ... T >
 // struct input
@@ -137,6 +171,11 @@ namespace pipeline
   struct in_process : public virtual process
   {
     in_process() : out( this ) {}
+
+    ~in_process() override
+      {
+	out.detach();
+      }
 
     template< std::size_t I >
     auto &
