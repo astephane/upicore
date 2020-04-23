@@ -54,6 +54,8 @@ point_cloud_pipeline()
 int
 main( int unused( argc ), char * unused( argv )[] )
 {
+  image_pipeline();
+  point_cloud_pipeline();
 
   return EXIT_SUCCESS;
 }
