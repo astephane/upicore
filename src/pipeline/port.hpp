@@ -35,33 +35,26 @@ namespace pipeline
   class process;
 
 
-  namespace details
-  {
-    template< typename Data >
-    struct out_port
-    {
-      using value_type = Data;
-
-      using source_pointer_type = cxx::raw_ptr< process >;
-
-      out_port( source_pointer_type s ) :
-	source( s )
-      {
-	assert( source );
-
-	if( !source )
-	  throw std::invalid_argument( "unexpected nullptr source." );
-      }
-
-      source_pointer_type source;
-      Data data;
-  };
-  } // end of details.
-
-
   template< typename Data >
-  using port = details::out_port< Data >;
+  struct port
+  {
+    using value_type = Data;
+
+    using source_pointer_type = cxx::raw_ptr< process >;
+
+    port( source_pointer_type s ) :
+      source( s )
+    {
+      assert( source );
+
+      if( !source )
+	throw std::invalid_argument( "unexpected nullptr source." );
+    }
+
+    source_pointer_type source;
+    Data data;
+  };
 
 } // end of namespace 'pipeline'.
 
-#endif // PORT_HPP
+#endif // PIPELINE_PORT_HPP
