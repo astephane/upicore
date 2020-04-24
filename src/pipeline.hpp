@@ -30,7 +30,22 @@ namespace cxx
 {
   template< typename T >
   using raw_ptr = std::add_pointer_t< T >;
-} // end of namespace cxx.
+
+  namespace tuple
+  {
+    template< typename F, typename Tuple >
+    constexpr decltype( auto ) for_each( F && f, Tuple && t )
+    {
+      std::apply(
+	[ &f ]( auto && ... e ) {
+	  ( ( f( e ) ),  ... );
+	},
+	t
+	);
+    }
+  } // end of namespace 'tuple'.
+
+} // end of namespace 'cxx'.
 
 
 namespace pipeline
@@ -44,6 +59,8 @@ namespace pipeline
   struct process
   {
     virtual ~process() = default;
+
+    // virtual void uoi() = 0;
   };
 
 
@@ -82,9 +99,9 @@ namespace pipeline
 
 
 
-  template< typename In > class  out_process;
-  template< typename Out > class in_proces;
-  template< typename In, typename Out > class filter;
+  // template< typename In > class  out_process;
+  // template< typename Out > class in_proces;
+  // template< typename In, typename Out > class filter;
 
 
   namespace details
@@ -144,31 +161,44 @@ namespace pipeline
 
     ~output()
     {
-      std::apply(
-	[]( auto && ... port ) {
-	  ( ( assert( port ),
-	      std::cout << port << std::endl,
-	      port->source = nullptr ),
-	    ... );
+      cxx::tuple::for_each(
+	[]( auto && port ) {
+	  assert( port );
+	  port->source = nullptr;
 	},
 	data
 	);
     }
 
+    template< std::size_t I >
+    auto get() noexcept
+    {
+      return std::get< I >( data );
+    };
+
+  private:
     using value_type = std::tuple< std::shared_ptr< port< T > > ... >;
 
     value_type data;
   };
 
 
-  template< typename ... T >
-  using input = std::tuple< std::weak_ptr< port< T > > ... >;
+  // template< typename ... T >
+  // using input = std::tuple< std::weak_ptr< port< T > > ... >;
 
-// template< typename ... T >
-// struct input
-// {
-//     std::tuple< T ... > data;
-// };
+  template< typename ... T >
+  struct input
+  {
+    template< std::size_t I >
+    auto
+    get() noexcept
+    {
+      return std::get< I >( data );
+    }
+    using value_type = std::tuple< std::weak_ptr< port< T > > ... >;
+
+    value_type data;
+  };
 
 
   template< typename Out >
@@ -176,11 +206,21 @@ namespace pipeline
   {
     in_process() : out( this ) {}
 
-    template< std::size_t I >
-    auto &
-    output() noexcept
+    // template< std::size_t I >
+    // auto &
+    // output() noexcept
+    // {
+    //   return std::get< I >( out.data );
+    // }
+
+    void uoi()
     {
-      return std::get< I >( out.data );
+      cxx::tuple::for_each(
+	[]( auto && port ) {
+
+	},
+	out
+	);
     }
 
     Out out;
@@ -190,11 +230,23 @@ namespace pipeline
   template< typename In >
   struct out_process : public virtual process
   {
-    template< std::size_t I >
-    auto &
-    input() noexcept
+    // template< std::size_t I >
+    // auto &
+    // input() noexcept
+    // {
+    //   return std::get< I >( in );
+    // }
+
+    void uoi()
     {
-      return std::get< I >( in );
+      cxx::tuple::for_each(
+	[]( auto && port) {
+	  assert( port );
+	  assert( port->data.source );
+	  port->data.source->uoi();
+	},
+	in
+	);
     }
 
     In in;
