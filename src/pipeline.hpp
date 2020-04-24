@@ -97,27 +97,26 @@ namespace pipeline
       // using source_pointer_type = std::weak_ptr< process >;
       using source_pointer_type = cxx::raw_ptr< process >;
 
-      out_port( source_pointer_type s ) : source( s )
-	{
-	  assert( source );
+      out_port( source_pointer_type s ) :
+	source( s )
+      {
+	assert( source );
 
-	  if( !source )
-	    throw std::invalid_argument( "unexpected nullptr source." );
-	}
+	if( !source )
+	  throw std::invalid_argument( "unexpected nullptr source." );
+      }
 
       source_pointer_type source;
       Data data;
 
-      template< typename In > friend class in_process;
+      // private:
+      //   struct data
+      //   {
+      // 	data( std::weak_ptr< out_port > op ) {}
 
-    // private:
-    //   struct data
-    //   {
-    // 	data( std::weak_ptr< out_port > op ) {}
-
-    // 	source_pointer_type source;
-    // 	Data data;
-    //   };
+      // 	source_pointer_type source;
+      // 	Data data;
+      //   };
     };
   } // end of details.
 
@@ -139,26 +138,31 @@ namespace pipeline
   {
     using source_pointer_type = typename port< T ... >::source_pointer_type;
 
-    output( source_pointer_type p ) : data( std::make_shared< port< T > >( p ) ...  ) {}
+    output( source_pointer_type p ) :
+      data( std::make_shared< port< T > >( p ) ...  )
+    {}
+
+    ~output()
+    {
+      std::apply(
+	[]( auto && ... port ) {
+	  ( ( assert( port ),
+	      std::cout << port << std::endl,
+	      port->source = nullptr ),
+	    ... );
+	},
+	data
+	);
+    }
 
     using value_type = std::tuple< std::shared_ptr< port< T > > ... >;
 
     value_type data;
-
-  private:
-    void detach() noexcept
-      {
-	std::apply(
-	  []( auto && ... port ) {
-	    ( ( assert( port ), std::cout << port << std::endl, port->source = nullptr ), ... );
-	  },
-	  data );
-      }
   };
 
 
   template< typename ... T >
-  using input = std::tuple< std::shared_ptr< port< T > > * ... >;
+  using input = std::tuple< std::weak_ptr< port< T > > ... >;
 
 // template< typename ... T >
 // struct input
@@ -172,17 +176,12 @@ namespace pipeline
   {
     in_process() : out( this ) {}
 
-    ~in_process() override
-      {
-	out.detach();
-      }
-
     template< std::size_t I >
     auto &
     output() noexcept
-      {
-	return std::get< I >( out.data );
-      }
+    {
+      return std::get< I >( out.data );
+    }
 
     Out out;
   };
@@ -194,9 +193,9 @@ namespace pipeline
     template< std::size_t I >
     auto &
     input() noexcept
-      {
-	return std::get< I >( in );
-      }
+    {
+      return std::get< I >( in );
+    }
 
     In in;
   };
