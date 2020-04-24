@@ -17,11 +17,22 @@
 
 set( SOURCES
   main.cpp
+  cxx/memory.cpp
+  cxx/tuple.cpp
+  pipeline/input.cpp
+  pipeline/output.cpp
+  pipeline/port.cpp
+  pipeline/process.cpp
   pipeline.cpp
   )
 
 add_executable( ${PROJECT_NAME} ${SOURCES} )
 
+message( "CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}" )
+
 target_include_directories( ${PROJECT_NAME}
-  PUBLIC ${PROJECT_BINARY_DIR}/src
-  )
+  PUBLIC ${CMAKE_SOURCE_DIR}/src )
+
+# target_include_directories( ${PROJECT_NAME}
+#   PUBLIC ${PROJECT_BINARY_DIR}/src
+#   )
