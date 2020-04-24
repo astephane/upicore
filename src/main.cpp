@@ -34,8 +34,8 @@ image_pipeline()
   image_file_writer ifw;
   ndvi_filter ndvi;
 
-  ifw.input< 0 >() = &ndvi.output< 0 >();
-  ndvi.input< 0 >() = &ifr.output< 0 >();
+  ifw.input< 0 >() = ndvi.output< 0 >();
+  ndvi.input< 0 >() = ifr.output< 0 >();
 }
 
 
@@ -46,8 +46,8 @@ point_cloud_pipeline()
   las_file_writer lfw;
   point_cloud_algorithm pca;
 
-  lfw.input< 0 >() = &pca.output< 0 >();
-  pca.input< 0 >() = &lfr.output< 0 >();
+  lfw.input< 0 >() = pca.output< 0 >();
+  pca.input< 0 >() = lfr.output< 0 >();
 }
 
 
