@@ -36,6 +36,8 @@ image_pipeline()
 
   ifw.in.get< 0 >() = ndvi.out.get< 0 >();
   ndvi.in.get< 0 >() = ifr.out.get< 0 >();
+
+  ifw.update_output_information();
 }
 
 
@@ -48,6 +50,8 @@ point_cloud_pipeline()
 
   lfw.in.get< 0 >() = pca.out.get< 0 >();
   pca.in.get< 0 >() = lfr.out.get< 0 >();
+
+  lfw.update_output_information();
 }
 
 
