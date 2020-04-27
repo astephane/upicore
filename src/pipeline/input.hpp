@@ -18,10 +18,11 @@
 #define PIPELINE_INPUT_HPP
 
 
+#include "cxx/tuple.hpp"
 #include "pipeline/port.hpp"
 
 // #include <cassert>
-// #include <iostream>
+#include <iostream>
 #include <memory>
 // #include <stdexcept>
 // #include <tuple>
@@ -35,10 +36,27 @@ namespace pipeline
   struct input
   {
     template< std::size_t I >
-    auto
+    auto &
     get() noexcept
     {
       return std::get< I >( data );
+    }
+
+    void
+    update_output_information()
+    {
+      std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
+
+      cxx::tuple::for_each(
+	[]( auto && p ) {
+	  auto port = p.lock();
+
+	  assert( port );
+	  assert( port->source );
+
+	  port->source->update_output_information();
+	},
+	data );
     }
 
   private:
