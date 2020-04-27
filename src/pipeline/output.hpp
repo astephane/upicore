@@ -53,10 +53,21 @@ namespace pipeline
     }
 
     template< std::size_t I >
-    auto get() noexcept
+    auto &
+    get() noexcept
     {
       return std::get< I >( data );
     };
+
+    // void genarate_output_information()
+    // {
+    //   cxx::tuple::for_each(
+    // 	[]( auto && port ) {
+    // 	  assert( port );
+    // 	  // TODO:
+    // 	},
+    // 	data
+    // }
 
   private:
     using value_type = std::tuple< std::shared_ptr< port< T > > ... >;
