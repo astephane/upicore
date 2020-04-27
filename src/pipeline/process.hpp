@@ -37,7 +37,8 @@ namespace pipeline
   {
     virtual ~process() = default;
 
-    // virtual void uoi() = 0;
+    virtual void update_output_information() = 0;
+    // virtual void update() = 0;
   };
 
 
@@ -53,17 +54,47 @@ namespace pipeline
     //   return std::get< I >( out.data );
     // }
 
-    void uoi()
+    void update_output_information() override
     {
-      cxx::tuple::for_each(
-	[]( auto && port ) {
+      std::cout
+	<< "0x" << std::hex << this
+	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
 
-	},
-	out
-	);
+      // downstream(
+      // 	[]( auto && port ) {
+      // 	  assert( port );
+      // 	  port.data->set_information();
+      // 	}
+      // 	);
+
+
+      // cxx::tuple::for_each(
+      // 	[]( auto && port ) {
+      // 	  assert( port );
+      // 	  assert( port->data );
+
+      // 	  port->data.set_information();
+      // 	},
+      // 	out
+      // 	);
     }
 
     Out out;
+
+  protected:
+    // template< typename F,
+    // 	      typename ... Args >
+    // auto downstream( F && f, Args && ... args )
+    // {
+    //   cxx::tuple::for_each(
+    // 	[ &f, & args ... ]( auto && port ) {
+    // 	  f( port, args ... );
+    // 	},
+    // 	out
+    // 	);
+
+    //   return f;
+    // }
   };
 
 
@@ -77,19 +108,37 @@ namespace pipeline
     //   return std::get< I >( in );
     // }
 
-    void uoi()
+    void update_output_information() override
     {
-      cxx::tuple::for_each(
-	[]( auto && port) {
-	  assert( port );
-	  assert( port->data.source );
-	  port->data.source->uoi();
-	},
-	in
-	);
+      std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
+
+      // upstream(
+      // 	[]( auto && port) {
+      // 	  assert( port );
+      // 	  assert( port->data.source );
+      // 	  port->data.source->uoi();
+      // 	}
+      // 	);
+
+      in.update_output_information();
     }
 
     In in;
+
+  protected:
+    // template< typename F,
+    // 	      typename ... Args >
+    // void upstream( F && f, Args && ... args )
+    // {
+    //   cxx::tuple::for_each(
+    // 	[ &f, args ... ]( auto && port) {
+    // 	  f( port, args ... );
+    // 	},
+    // 	in
+    // 	);
+
+    //   return;
+    // }
   };
 
 
@@ -98,6 +147,12 @@ namespace pipeline
   struct filter : public in_process< Out >,
 		  public out_process< In >
   {
+    void update_output_information() override
+    {
+      std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
+
+      this->in.update_output_information();
+    }
   };
 
 // struct information
