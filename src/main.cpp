@@ -37,7 +37,9 @@ image_pipeline()
   ifw.in.get< 0 >() = ndvi.out.get< 0 >();
   ndvi.in.get< 0 >() = ifr.out.get< 0 >();
 
-  ifw.update_output_information();
+  pipeline::process_interface * process = &ifw;
+
+  process->update_output_information();
 }
 
 
