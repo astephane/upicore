@@ -47,67 +47,29 @@ namespace pipeline
   {
     in_process() : out( this ) {}
 
-    // template< std::size_t I >
-    // auto &
-    // output() noexcept
-    // {
-    //   return std::get< I >( out.data );
-    // }
-
     void update_output_information() override
     {
       std::cout
 	<< "0x" << std::hex << this
 	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
 
-      // downstream(
-      // 	[]( auto && port ) {
-      // 	  assert( port );
-      // 	  port.data->set_information();
-      // 	}
-      // 	);
+      // No upstream forwarding.
 
-
-      // cxx::tuple::for_each(
-      // 	[]( auto && port ) {
-      // 	  assert( port );
-      // 	  assert( port->data );
-
-      // 	  port->data.set_information();
-      // 	},
-      // 	out
-      // 	);
+      out.downstream(
+	[]( auto && port ) {
+	  assert( port );
+	  // port->data.set_info( in.get_primary().info() );
+	}
+	);
     }
 
     Out out;
-
-  protected:
-    // template< typename F,
-    // 	      typename ... Args >
-    // auto downstream( F && f, Args && ... args )
-    // {
-    //   cxx::tuple::for_each(
-    // 	[ &f, & args ... ]( auto && port ) {
-    // 	  f( port, args ... );
-    // 	},
-    // 	out
-    // 	);
-
-    //   return f;
-    // }
   };
 
 
   template< typename In >
   struct out_process : public virtual process
   {
-    // template< std::size_t I >
-    // auto &
-    // input() noexcept
-    // {
-    //   return std::get< I >( in );
-    // }
-
     void update_output_information() override
     {
       std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
@@ -127,21 +89,6 @@ namespace pipeline
     }
 
     In in;
-
-  protected:
-    // template< typename F,
-    // 	      typename ... Args >
-    // void upstream( F && f, Args && ... args )
-    // {
-    //   cxx::tuple::for_each(
-    // 	[ &f, args ... ]( auto && port) {
-    // 	  f( port, args ... );
-    // 	},
-    // 	in
-    // 	);
-
-    //   return;
-    // }
   };
 
 
@@ -154,18 +101,17 @@ namespace pipeline
     {
       std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
 
-      this->in.update_output_information();
+      this->out_process< In >::update_output_information();
+      this->in_process< Out >::update_output_information();
     }
   };
 
-// struct information
-// {
-// };
 
   template< typename ... Outputs >
   struct reader : public in_process< output< Outputs ... > >
   {
   };
+
 
   template< typename ... Inputs >
   struct writer : public out_process< input< Inputs ... > >
