@@ -37,9 +37,15 @@ image_pipeline()
   ifw.in.get< 0 >() = ndvi.out.get< 0 >();
   ndvi.in.get< 0 >() = ifr.out.get< 0 >();
 
+#if 0
   pipeline::process_interface * process = &ifw;
 
   process->update_output_information();
+
+#else
+  ifw.update_output_information();
+
+#endif
 }
 
 
@@ -53,14 +59,22 @@ point_cloud_pipeline()
   lfw.in.get< 0 >() = pca.out.get< 0 >();
   pca.in.get< 0 >() = lfr.out.get< 0 >();
 
+#if 0
+  pipeline::process_interface * process = &lfw;
+
+  process->update_output_information();
+
+#else
   lfw.update_output_information();
+
+#endif
 }
 
 
 int
 main( int unused( argc ), char * unused( argv )[] )
 {
-  image_pipeline();
+  // image_pipeline();
   point_cloud_pipeline();
 
   return EXIT_SUCCESS;
