@@ -51,7 +51,7 @@ namespace pipeline
     update_output_information() override
     {
       std::cout
-	<< "0x" << std::hex << this
+	<< "I- 0x" << std::hex << this << " "
 	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
 
       // No upstream forwarding.
@@ -73,10 +73,14 @@ namespace pipeline
     void
     update_output_information() override
     {
-      std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
+      std::cout
+	<< "-O 0x" << std::hex << this << " "
+	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
 
       in.upstream(
       	[]( auto && port) {
+	  std::cout << "out_process::uoi()" << std::endl;
+
       	  assert( port );
       	  assert( port->source );
 
@@ -96,7 +100,9 @@ namespace pipeline
   {
     void update_output_information() override
     {
-      std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
+      std::cout
+      	<< "IO 0x" << std::hex << this << " "
+      	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
 
       // Upstream recursion.
       this->out_process< In >::update_output_information();
@@ -109,12 +115,17 @@ namespace pipeline
     void
     generate_output_information() override
     {
+      std::cout
+	<< "0x" << std::hex << this << " "
+	<< typeid( this ).name() << "::generate_output_information()" << std::endl;
+
       auto primary_input = this->in.primary().lock();
 
       assert( primary_input );
 
       this->out.downstream(
 	[ &primary_input ]( auto && port ) {
+	  std::cout << "out_process::goi()" << std::endl;
 	  assert( port );
 
 	  port->data.set_information( primary_input->data.information() );

@@ -63,7 +63,11 @@ struct point_cloud : public pipeline::data
 
 struct las_file_reader : public pipeline::reader< point_cloud >
 {
-  void generate_output_information() override {}
+  void
+  generate_output_information() override
+  {
+    std::cout << "las_file_reader::generate_output_information()" << std::endl;
+  }
 };
 
 
