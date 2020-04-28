@@ -27,7 +27,7 @@
 namespace pipeline
 {
 
-  class process;
+  class process_interface;
 
 
   template< typename Data >
@@ -35,7 +35,7 @@ namespace pipeline
   {
     using value_type = Data;
 
-    using source_pointer_type = cxx::raw_ptr< process >;
+    using source_pointer_type = cxx::raw_ptr< process_interface >;
 
     port( source_pointer_type s ) :
       source( s )

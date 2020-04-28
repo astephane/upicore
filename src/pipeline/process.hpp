@@ -33,9 +33,9 @@
 namespace pipeline
 {
 
-  struct process
+  struct process_interface
   {
-    virtual ~process() = default;
+    virtual ~process_interface() = default;
 
     virtual void update_output_information() = 0;
     // virtual void update() = 0;
@@ -43,11 +43,12 @@ namespace pipeline
 
 
   template< typename Out >
-  struct in_process : public virtual process
+  struct in_process : public virtual process_interface
   {
     in_process() : out( this ) {}
 
-    void update_output_information() override
+    void
+    update_output_information() override
     {
       std::cout
 	<< "0x" << std::hex << this
@@ -55,22 +56,22 @@ namespace pipeline
 
       // No upstream forwarding.
 
-      out.downstream(
-	[]( auto && port ) {
-	  assert( port );
-	  // port->data.set_info( in.get_primary().info() );
-	}
-	);
+      // Downstream tail-recursion.
+      generate_output_information();
     }
 
     Out out;
+
+  private:
+    virtual void generate_output_information() = 0;
   };
 
 
   template< typename In >
-  struct out_process : public virtual process
+  struct out_process : public virtual process_interface
   {
-    void update_output_information() override
+    void
+    update_output_information() override
     {
       std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
 
@@ -82,10 +83,6 @@ namespace pipeline
       	  port->source->update_output_information();
       	}
       	);
-
-      // in.update_output_information();
-
-
     }
 
     In in;
@@ -94,15 +91,35 @@ namespace pipeline
 
   template< typename In,
 	    typename Out >
-  struct filter : public in_process< Out >,
-		  public out_process< In >
+  struct process : public in_process< Out >,
+		   public out_process< In >
   {
     void update_output_information() override
     {
       std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
 
+      // Upstream recursion.
       this->out_process< In >::update_output_information();
+
+      // Downstream tail-recursion.
       this->in_process< Out >::update_output_information();
+    }
+
+  private:
+    void
+    generate_output_information() override
+    {
+      auto primary_input = this->in.primary().lock();
+
+      assert( primary_input );
+
+      this->out.downstream(
+	[ &primary_input ]( auto && port ) {
+	  assert( port );
+
+	  port->data.set_information( primary_input->data.information() );
+	}
+	);
     }
   };
 
