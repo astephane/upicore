@@ -20,7 +20,6 @@
 
 #include <tuple>
 
-
 namespace cxx
 {
   template< typename T >
@@ -31,12 +30,13 @@ namespace cxx
     template< typename F, typename Tuple >
     constexpr decltype( auto ) for_each( F && f, Tuple && t )
     {
-      std::apply(
-	[ &f ]( auto && ... e ) {
-	  ( ( f( e ) ),  ... );
-	},
-	t
-	);
+      return
+	std::apply(
+	  [ &f ]( auto && ... e ) {
+	    ( ( f( e ) ),  ... );
+	  },
+	  t
+	  );
     }
   } // end of namespace 'tuple'.
 
