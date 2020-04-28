@@ -31,11 +31,15 @@
 
 struct image : public pipeline::data
 {
+  void set_information( int ) {}
+  int information() const { return -1; }
 };
 
 
 struct image_file_reader : public pipeline::reader< image >
 {
+private:
+  void generate_output_information() override {}
 };
 
 
@@ -44,19 +48,22 @@ struct image_file_writer : public pipeline::writer< image >
 };
 
 
-struct ndvi_filter : public pipeline::filter< pipeline::input< image >,
-					      pipeline::output< image > >
+struct ndvi_filter : public pipeline::process< pipeline::input< image >,
+					       pipeline::output< image > >
 {
 };
 
 
 struct point_cloud : public pipeline::data
 {
+  void set_information( int ) {}
+  int information() const { return -1; }
 };
 
 
 struct las_file_reader : public pipeline::reader< point_cloud >
 {
+  void generate_output_information() override {}
 };
 
 
@@ -65,8 +72,8 @@ struct las_file_writer : public pipeline::writer< point_cloud >
 };
 
 
-struct point_cloud_algorithm : public pipeline::filter< pipeline::input< point_cloud >,
-							pipeline::output< point_cloud > >
+struct point_cloud_algorithm : public pipeline::process< pipeline::input< point_cloud >,
+							 pipeline::output< point_cloud > >
 {
 };
 
