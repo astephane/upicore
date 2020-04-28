@@ -16,3 +16,7 @@
 
 #define UPICORE_VERSION_MAJOR @upicore_VERSION_MAJOR@
 #define UPICORE_VERSION_MINOR @upicore_VERSION_MINOR@
+
+// #if __cplusplus>=202002L
+// #elif __cplusplus>=201703L
+// #endif // __cplusplus
