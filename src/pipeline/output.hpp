@@ -21,12 +21,7 @@
 #include "cxx/tuple.hpp"
 #include "pipeline/port.hpp"
 
-// #include <cassert>
-// #include <iostream>
 #include <memory>
-// #include <stdexcept>
-// #include <tuple>
-// #include <type_traits>
 
 
 namespace pipeline
@@ -71,16 +66,6 @@ namespace pipeline
 	  data
 	  );
     }
-
-    // void genarate_output_information()
-    // {
-    //   cxx::tuple::for_each(
-    // 	[]( auto && port ) {
-    // 	  assert( port );
-    // 	  // TODO:
-    // 	},
-    // 	data
-    // }
 
   private:
     using value_type = std::tuple< std::shared_ptr< port< T > > ... >;
