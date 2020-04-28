@@ -29,6 +29,20 @@
 // #include <type_traits>
 
 
+// https://stackoverflow.com/questions/47496358/c-lambdas-how-to-capture-variadic-parameter-pack-from-the-upper-scope
+#if 0
+
+template <typename ... Args>
+auto f(Args&& ... args){
+    return [args = std::make_tuple(std::forward<Args>(args) ...)]()mutable{
+        return std::apply([](auto&& ... args){
+            // use args
+        }, std::move(args));
+    };
+}
+
+#endif
+
 namespace pipeline
 {
 
@@ -42,21 +56,39 @@ namespace pipeline
       return std::get< I >( data );
     }
 
+    template< typename F >
+    auto
+    upstream( F && f )
+    {
+      return
+	cxx::tuple::for_each(
+	  [ &f ]( auto && p ) {
+	    f( p.lock() );
+	  },
+	  data
+	  );
+    }
+
     void
     update_output_information()
     {
       std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
 
-      cxx::tuple::for_each(
+      upstream(
 	[]( auto && p ) {
-	  auto port = p.lock();
+	  // auto port = p.lock();
 
-	  assert( port );
-	  assert( port->source );
+	  // assert( port );
+	  // assert( port->source );
 
-	  port->source->update_output_information();
-	},
-	data );
+	  // port->source->update_output_information();
+
+	  assert( p );
+	  assert( p->source );
+
+	  p->source->update_output_information();
+	}
+	);
     }
 
   private:
