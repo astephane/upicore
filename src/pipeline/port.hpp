@@ -21,12 +21,7 @@
 
 
 #include <cassert>
-// #include <iostream>
-// #include <memory>
 #include <stdexcept>
-// #include <tuple>
-// #include <type_traits>
-
 
 
 namespace pipeline
@@ -49,6 +44,16 @@ namespace pipeline
 
       if( !source )
 	throw std::invalid_argument( "unexpected nullptr source." );
+    }
+
+    void
+    update()
+    {
+      assert( source );
+
+      // source->update_output_information();
+      // source->propagate_requested_region();
+      // source->update_output_data();
     }
 
     source_pointer_type source;
