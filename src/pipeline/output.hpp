@@ -59,6 +59,19 @@ namespace pipeline
       return std::get< I >( data );
     };
 
+    template< typename F >
+    auto
+    downstream( F && f )
+    {
+      return
+	cxx::tuple::for_each(
+	  [ &f ]( auto && port ) {
+	    f( port );
+	  },
+	  data
+	  );
+    }
+
     // void genarate_output_information()
     // {
     //   cxx::tuple::for_each(
