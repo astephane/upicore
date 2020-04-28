@@ -31,6 +31,8 @@ namespace pipeline
 
   struct data
   {
+    // Derived classes must define information()
+    // Derived classes must define set_information()
   };
 
 } // end of namespace 'pipeline'.
