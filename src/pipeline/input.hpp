@@ -52,6 +52,19 @@ namespace pipeline
       return std::get< I >( data );
     }
 
+    template< std::size_t I >
+    auto const &
+    get() const noexcept
+    {
+      return std::get< I >( data );
+    }
+
+    auto const &
+    primary() const noexcept
+    {
+      return get< 0 >();
+    }
+
     template< typename F >
     auto
     upstream( F && f )
