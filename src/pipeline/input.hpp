@@ -21,12 +21,8 @@
 #include "cxx/tuple.hpp"
 #include "pipeline/port.hpp"
 
-// #include <cassert>
 #include <iostream>
 #include <memory>
-// #include <stdexcept>
-// #include <tuple>
-// #include <type_traits>
 
 
 // https://stackoverflow.com/questions/47496358/c-lambdas-how-to-capture-variadic-parameter-pack-from-the-upper-scope
@@ -76,13 +72,6 @@ namespace pipeline
 
       upstream(
 	[]( auto && p ) {
-	  // auto port = p.lock();
-
-	  // assert( port );
-	  // assert( port->source );
-
-	  // port->source->update_output_information();
-
 	  assert( p );
 	  assert( p->source );
 
