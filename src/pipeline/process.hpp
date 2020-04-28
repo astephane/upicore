@@ -112,15 +112,18 @@ namespace pipeline
     {
       std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
 
-      // upstream(
-      // 	[]( auto && port) {
-      // 	  assert( port );
-      // 	  assert( port->data.source );
-      // 	  port->data.source->uoi();
-      // 	}
-      // 	);
+      in.upstream(
+      	[]( auto && port) {
+      	  assert( port );
+      	  assert( port->source );
 
-      in.update_output_information();
+      	  port->source->update_output_information();
+      	}
+      	);
+
+      // in.update_output_information();
+
+
     }
 
     In in;
