@@ -35,7 +35,10 @@ image_pipeline()
   ndvi_filter ndvi;
 
   ifw.in.get< 0 >() = ndvi.out.get< 0 >();
+  ifw.in.get< 1 >() = ndvi.out.get< 1 >();
+
   ndvi.in.get< 0 >() = ifr.out.get< 0 >();
+  ndvi.in.get< 1 >() = ifr.out.get< 1 >();
 
 #if 0
   pipeline::process_interface * process = &ifw;
@@ -57,7 +60,10 @@ point_cloud_pipeline()
   point_cloud_algorithm pca;
 
   lfw.in.get< 0 >() = pca.out.get< 0 >();
+  lfw.in.get< 1 >() = pca.out.get< 1 >();
+
   pca.in.get< 0 >() = lfr.out.get< 0 >();
+  pca.in.get< 1 >() = lfr.out.get< 1 >();
 
 #if 0
   pipeline::process_interface * process = &lfw;

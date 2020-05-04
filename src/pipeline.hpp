@@ -29,59 +29,77 @@
 // #include <type_traits>
 
 
+struct foo : public pipeline::data
+{
+  void set_information( int )
+  {
+    TRACE_THIS_FUN();
+  }
+
+  int information() const { return -1; }
+};
+
 struct image : public pipeline::data
 {
-  void set_information( int ) {}
+  void set_information( int )
+  {
+    TRACE_THIS_FUN();
+  }
+
   int information() const { return -1; }
 };
 
 
-struct image_file_reader : public pipeline::reader< image >
+struct image_file_reader : public pipeline::reader< image, foo >
 {
 private:
   void
   generate_output_information() override
   {
-    std::cout << "image_file_reader::generate_output_information()" << std::endl;
+    TRACE_THIS_FUN();
   }
 };
 
 
-struct image_file_writer : public pipeline::writer< image >
+struct image_file_writer : public pipeline::writer< image, foo >
 {
 };
 
 
-struct ndvi_filter : public pipeline::process< pipeline::input< image >,
-					       pipeline::output< image > >
+struct ndvi_filter : public pipeline::process< pipeline::input< image, foo >,
+					       pipeline::output< image, foo > >
 {
 };
 
 
 struct point_cloud : public pipeline::data
 {
-  void set_information( int ) {}
+  void set_information( int )
+  {
+    TRACE_THIS_FUN();
+  }
+
   int information() const { return -1; }
 };
 
 
-struct las_file_reader : public pipeline::reader< point_cloud >
+struct las_file_reader : public pipeline::reader< point_cloud, foo >
 {
   void
   generate_output_information() override
   {
-    std::cout << "las_file_reader::generate_output_information()" << std::endl;
+    TRACE_THIS_FUN();
   }
 };
 
 
-struct las_file_writer : public pipeline::writer< point_cloud >
+struct las_file_writer : public pipeline::writer< point_cloud, foo >
 {
 };
 
 
-struct point_cloud_algorithm : public pipeline::process< pipeline::input< point_cloud >,
-							 pipeline::output< point_cloud > >
+struct point_cloud_algorithm : public pipeline::process< pipeline::input< point_cloud, foo >,
+							 pipeline::output< point_cloud, foo > >
 {
 };
 
