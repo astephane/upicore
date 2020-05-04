@@ -1,3 +1,5 @@
+syntax: glob
+
 # Prerequisites
 *.d
 
@@ -33,3 +35,13 @@
 
 # Backups
 *~
+
+# Custom
+.*.swp
+*.orig
+*.pyc
+.\#*
+\#*\#
+tags
+*vim*
+*.template
