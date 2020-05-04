@@ -30,6 +30,17 @@
 // #include <type_traits>
 
 
+#define TRACE_FUN_IMPL( p )			\
+  std::cout					\
+  << ( p )					\
+  << " " << __PRETTY_FUNCTION__			\
+  << std::endl
+
+#define TRACE_THIS_FUN() TRACE_FUN_IMPL( this )
+
+// #define TRACE_FUN() TRACE_FUN_IMPL( nullptr )
+
+
 namespace pipeline
 {
 
@@ -50,10 +61,14 @@ namespace pipeline
     void
     update_output_information() override
     {
+#if 0
       std::cout
 	<< "I- 0x" << std::hex << this << " "
 	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
+#else
+      TRACE_THIS_FUN();
 
+#endif
       // No upstream forwarding.
 
       // Downstream tail-recursion.
@@ -64,6 +79,7 @@ namespace pipeline
 
   private:
     virtual void generate_output_information() = 0;
+    // virtual void update_output_data() = 0;
   };
 
 
@@ -73,13 +89,19 @@ namespace pipeline
     void
     update_output_information() override
     {
+#if 0
       std::cout
 	<< "-O 0x" << std::hex << this << " "
 	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
+#else
+      TRACE_THIS_FUN();
+#endif
 
       in.upstream(
       	[]( auto && port) {
-	  std::cout << "out_process::uoi()" << std::endl;
+	  // TRACE_FUN();
+
+	  std::cout << "out_process::update_output_information()" << std::endl;
 
       	  assert( port );
       	  assert( port->source );
@@ -100,9 +122,13 @@ namespace pipeline
   {
     void update_output_information() override
     {
+#if 0
       std::cout
       	<< "IO 0x" << std::hex << this << " "
       	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
+#else
+      TRACE_THIS_FUN();
+#endif
 
       // Upstream recursion.
       this->out_process< In >::update_output_information();
@@ -115,9 +141,13 @@ namespace pipeline
     void
     generate_output_information() override
     {
+#if 0
       std::cout
 	<< "0x" << std::hex << this << " "
 	<< typeid( this ).name() << "::generate_output_information()" << std::endl;
+#else
+      TRACE_THIS_FUN();
+#endif
 
       auto primary_input = this->in.primary().lock();
 
@@ -125,7 +155,10 @@ namespace pipeline
 
       this->out.downstream(
 	[ &primary_input ]( auto && port ) {
-	  std::cout << "out_process::goi()" << std::endl;
+	  // TRACE_FUN();
+
+	  std::cout << "out_process::generate_output_information()" << std::endl;
+
 	  assert( port );
 
 	  port->data.set_information( primary_input->data.information() );
