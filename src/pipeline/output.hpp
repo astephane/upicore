@@ -30,9 +30,9 @@ namespace pipeline
   template< typename ... T >
   struct output
   {
-    using source_pointer_type = typename port< T ... >::source_pointer_type;
+    using source_pointer = port_interface::source_pointer;
 
-    output( source_pointer_type p ) :
+    output( source_pointer p ) :
       data( std::make_shared< port< T > >( p ) ...  )
     {}
 

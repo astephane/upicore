@@ -29,15 +29,20 @@ namespace pipeline
 
   class process_interface;
 
+  namespace port_interface
+  {
+    using source_pointer = cxx::raw_ptr< process_interface >;
+  }
+
 
   template< typename Data >
   struct port
   {
     using value_type = Data;
 
-    using source_pointer_type = cxx::raw_ptr< process_interface >;
+    using source_pointer = port_interface::source_pointer;
 
-    port( source_pointer_type s ) :
+    port( source_pointer s ) :
       source( s )
     {
       assert( source );
@@ -56,7 +61,7 @@ namespace pipeline
       // source->update_output_data();
     }
 
-    source_pointer_type source;
+    source_pointer source;
     Data data;
   };
 
