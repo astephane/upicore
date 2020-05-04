@@ -44,17 +44,8 @@
 namespace pipeline
 {
 
-  struct process_interface
-  {
-    virtual ~process_interface() = default;
-
-    virtual void update_output_information() = 0;
-    // virtual void update() = 0;
-  };
-
-
   template< typename Out >
-  struct in_process : public virtual process_interface
+  struct in_process : public in_process_interface
   {
     in_process() : out( this ) {}
 
@@ -84,7 +75,7 @@ namespace pipeline
 
 
   template< typename In >
-  struct out_process : public virtual process_interface
+  struct out_process : public out_process_interface
   {
     void
     update_output_information() override

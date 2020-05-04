@@ -26,12 +26,26 @@
 
 namespace pipeline
 {
+  struct process_interface
+  {
+    virtual ~process_interface() = default;
 
-  class process_interface;
+    virtual void update_output_information() = 0;
+    // virtual void update() = 0;
+  };
+
+  struct in_process_interface : public virtual process_interface
+  {
+  };
+
+  struct out_process_interface : public virtual process_interface
+  {
+  };
+
 
   namespace port_interface
   {
-    using source_pointer = cxx::raw_ptr< process_interface >;
+    using source_pointer = cxx::raw_ptr< in_process_interface >;
   }
 
 
@@ -56,9 +70,9 @@ namespace pipeline
     {
       assert( source );
 
-      // source->update_output_information();
+      source->update_output_information();
       // source->propagate_requested_region();
-      // source->update_output_data();
+      // source->update_output_data( data );
     }
 
     source_pointer source;
