@@ -39,7 +39,11 @@ struct image : public pipeline::data
 struct image_file_reader : public pipeline::reader< image >
 {
 private:
-  void generate_output_information() override {}
+  void
+  generate_output_information() override
+  {
+    std::cout << "image_file_reader::generate_output_information()" << std::endl;
+  }
 };
 
 
