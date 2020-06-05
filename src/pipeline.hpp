@@ -39,6 +39,7 @@ struct foo : public pipeline::data
   int information() const { return -1; }
 };
 
+
 struct image : public pipeline::data
 {
   void set_information( int )
@@ -54,7 +55,13 @@ struct image_file_reader : public pipeline::reader< image, foo >
 {
 private:
   void
-  generate_output_information() override
+  generate_output_info() override
+  {
+    TRACE_THIS_FUN();
+  }
+
+  void
+  generate_output_data() override
   {
     TRACE_THIS_FUN();
   }
@@ -86,7 +93,13 @@ struct point_cloud : public pipeline::data
 struct las_file_reader : public pipeline::reader< point_cloud, foo >
 {
   void
-  generate_output_information() override
+  generate_output_info() override
+  {
+    TRACE_THIS_FUN();
+  }
+
+  void
+  generate_output_data() override
   {
     TRACE_THIS_FUN();
   }
