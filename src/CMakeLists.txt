@@ -18,6 +18,7 @@
 set( SOURCES
   main.cpp
   cxx/memory.cpp
+  cxx/trace.cpp
   cxx/tuple.cpp
   pipeline/data.cpp
   pipeline/input.cpp
