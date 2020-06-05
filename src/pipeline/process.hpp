@@ -53,40 +53,35 @@ namespace pipeline
     }
 
     Out out;
-
-  private:
-    // virtual void generate_output_information() = 0;
-    // virtual void update_output_data() = 0;
   };
+
+
+#define OUT_PROCESS_UPDATE_OUTPUT( name )				\
+  void									\
+  update_output_##name() override					\
+  {									\
+    TRACE_THIS_FUN();							\
+									\
+    in.upstream(							\
+      []( auto && port) {						\
+	std::cout << "out_process::update_output_()"			\
+		  << #name						\
+		  << std::endl;						\
+									\
+	assert( port );							\
+	assert( port->source );						\
+									\
+	port->source->update_output_##name();				\
+      }									\
+      );								\
+  }
 
 
   template< typename In >
   struct out_process : public out_process_interface
   {
-    void
-    update_output_information() override
-    {
-#if 0
-      std::cout
-	<< "-O 0x" << std::hex << this << " "
-	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
-#else
-      TRACE_THIS_FUN();
-#endif
-
-      in.upstream(
-      	[]( auto && port) {
-	  // TRACE_FUN();
-
-	  std::cout << "out_process::update_output_information()" << std::endl;
-
-      	  assert( port );
-      	  assert( port->source );
-
-	  port->source->update_output_information();
-      	}
-      	);
-    }
+    OUT_PROCESS_UPDATE_OUTPUT( information );
+    OUT_PROCESS_UPDATE_OUTPUT( data );
 
     In in;
   };

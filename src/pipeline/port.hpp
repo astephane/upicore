@@ -33,6 +33,7 @@ namespace pipeline
     // virtual void update() = 0;
 
     virtual void update_output_information() = 0;
+    virtual void update_output_data() = 0;
   };
 
 
