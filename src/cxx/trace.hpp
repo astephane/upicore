@@ -18,15 +18,23 @@
 #define CXX_TRACE_HPP
 
 
-#define TRACE_FUN_IMPL( p )			\
+#include <iostream>
+
+
+#define TRACE_THAT_FUN( p )			\
   std::cout					\
   << ( p )					\
   << " " << __PRETTY_FUNCTION__			\
   << std::endl
 
-#define TRACE_THIS_FUN() TRACE_FUN_IMPL( this )
 
-// #define TRACE_FUN() TRACE_FUN_IMPL( nullptr )
+#define TRACE_THIS_FUN() TRACE_THAT_FUN( this )
+
+
+#define TRACE_FUN()				\
+  std::cout					\
+  << " " << __PRETTY_FUNCTION__			\
+  << std::endl
 
 
 namespace cxx
