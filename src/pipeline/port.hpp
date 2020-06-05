@@ -30,13 +30,18 @@ namespace pipeline
   {
     virtual ~process_interface() = default;
 
-    virtual void update_output_information() = 0;
     // virtual void update() = 0;
+
+    virtual void update_output_information() = 0;
   };
+
 
   struct in_process_interface : public virtual process_interface
   {
+    // private:
+    virtual void generate_output_information() = 0;
   };
+
 
   struct out_process_interface : public virtual process_interface
   {
@@ -72,7 +77,12 @@ namespace pipeline
 
       source->update_output_information();
       // source->propagate_requested_region();
+
+#if 1
       // source->update_output_data( data );
+#else
+      source->update_output_data();
+#endif
     }
 
     source_pointer source;

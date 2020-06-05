@@ -21,24 +21,7 @@
 // #include "cxx.hpp"
 #include "input.hpp"
 #include "output.hpp"
-
-// #include <cassert>
-// #include <iostream>
-// #include <memory>
-// #include <stdexcept>
-// #include <tuple>
-// #include <type_traits>
-
-
-#define TRACE_FUN_IMPL( p )			\
-  std::cout					\
-  << ( p )					\
-  << " " << __PRETTY_FUNCTION__			\
-  << std::endl
-
-#define TRACE_THIS_FUN() TRACE_FUN_IMPL( this )
-
-// #define TRACE_FUN() TRACE_FUN_IMPL( nullptr )
+#include "cxx/trace.hpp"
 
 
 namespace pipeline
@@ -48,6 +31,9 @@ namespace pipeline
   struct in_process : public in_process_interface
   {
     in_process() : out( this ) {}
+
+    template< typename Port >
+    void update_output_data( Port const & );
 
     void
     update_output_information() override
@@ -69,7 +55,7 @@ namespace pipeline
     Out out;
 
   private:
-    virtual void generate_output_information() = 0;
+    // virtual void generate_output_information() = 0;
     // virtual void update_output_data() = 0;
   };
 
@@ -97,7 +83,7 @@ namespace pipeline
       	  assert( port );
       	  assert( port->source );
 
-      	  port->source->update_output_information();
+	  port->source->update_output_information();
       	}
       	);
     }
