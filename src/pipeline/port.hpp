@@ -32,7 +32,7 @@ namespace pipeline
 
     // virtual void update() = 0;
 
-    virtual void update_output_information() = 0;
+    virtual void update_output_info() = 0;
     virtual void update_output_data() = 0;
   };
 
@@ -40,7 +40,8 @@ namespace pipeline
   struct in_process_interface : public virtual process_interface
   {
    protected:
-    virtual void generate_output_information() = 0;
+    virtual void generate_output_info() = 0;
+    virtual void generate_output_data() = 0;
   };
 
 
@@ -76,7 +77,7 @@ namespace pipeline
     {
       assert( source );
 
-      source->update_output_information();
+      source->update_output_info();
       // source->propagate_requested_region();
 
 #if 1

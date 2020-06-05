@@ -21,7 +21,9 @@ set( SOURCES
   cxx/trace.cpp
   cxx/tuple.cpp
   pipeline/data.cpp
+  pipeline/in_process.cpp
   pipeline/input.cpp
+  pipeline/out_process.cpp
   pipeline/output.cpp
   pipeline/port.cpp
   pipeline/process.cpp

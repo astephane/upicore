@@ -22,104 +22,38 @@
 #include "input.hpp"
 #include "output.hpp"
 #include "cxx/trace.hpp"
+#include "pipeline/in_process.hpp"
+#include "pipeline/out_process.hpp"
 
 
 namespace pipeline
 {
 
-  template< typename Out >
-  struct in_process : public in_process_interface
-  {
-    in_process() : out( this ) {}
-
-    template< typename Port >
-    void update_output_data( Port const & );
-
-    void
-    update_output_information() override
-    {
-#if 0
-      std::cout
-	<< "I- 0x" << std::hex << this << " "
-	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
-#else
-      TRACE_THIS_FUN();
-
-#endif
-      // No upstream forwarding.
-
-      // Downstream tail-recursion.
-      generate_output_information();
-    }
-
-    Out out;
-  };
-
-
-#define OUT_PROCESS_UPDATE_OUTPUT( name )				\
-  void									\
-  update_output_##name() override					\
-  {									\
-    TRACE_THIS_FUN();							\
-									\
-    in.upstream(							\
-      []( auto && port) {						\
-	std::cout << "out_process::update_output_()"			\
-		  << #name						\
-		  << std::endl;						\
-									\
-	assert( port );							\
-	assert( port->source );						\
-									\
-	port->source->update_output_##name();				\
-      }									\
-      );								\
+#define PROCESS_UPDATE_OUTPUT( name )				\
+  void update_output_##name() override				\
+  {								\
+    TRACE_THIS_FUN();						\
+								\
+    /* Upstream recursion. */					\
+    this->out_process< In >::update_output_##name();		\
+								\
+    /* Downstream tail-recursion. */				\
+    this->in_process< Out >::update_output_##name();		\
   }
-
-
-  template< typename In >
-  struct out_process : public out_process_interface
-  {
-    OUT_PROCESS_UPDATE_OUTPUT( information );
-    OUT_PROCESS_UPDATE_OUTPUT( data );
-
-    In in;
-  };
-
 
   template< typename In,
 	    typename Out >
   struct process : public in_process< Out >,
 		   public out_process< In >
   {
-    void update_output_information() override
-    {
-#if 0
-      std::cout
-      	<< "IO 0x" << std::hex << this << " "
-      	<< typeid( this ).name() << "::upate_output_information()" << std::endl;
-#else
-      TRACE_THIS_FUN();
-#endif
-
-      // Upstream recursion.
-      this->out_process< In >::update_output_information();
-
-      // Downstream tail-recursion.
-      this->in_process< Out >::update_output_information();
-    }
+    PROCESS_UPDATE_OUTPUT( info );
+    PROCESS_UPDATE_OUTPUT( data );
 
   private:
     void
-    generate_output_information() override
+    generate_output_info() override
     {
-#if 0
-      std::cout
-	<< "0x" << std::hex << this << " "
-	<< typeid( this ).name() << "::generate_output_information()" << std::endl;
-#else
       TRACE_THIS_FUN();
-#endif
 
       auto primary_input = this->in.primary().lock();
 
