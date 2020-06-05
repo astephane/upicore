@@ -38,7 +38,7 @@ namespace pipeline
 
   struct in_process_interface : public virtual process_interface
   {
-    // private:
+   protected:
     virtual void generate_output_information() = 0;
   };
 
