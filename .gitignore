@@ -45,3 +45,8 @@ syntax: glob
 tags
 *vim*
 *.template
+
+# GTAGS
+GPATH
+GRTAGS
+GTAGS
