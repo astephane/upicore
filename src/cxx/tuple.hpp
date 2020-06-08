@@ -53,11 +53,10 @@ namespace cxx
 		 RHSTuple && rhs,
 		 std::index_sequence< I ... > )
       {
-	return std::invoke(
-	  std::forward< F >( f ),
-	  ( std::get< I >( std::forward< LHSTuple >( lhs ) ),
-	    std::get< I >( std::forward< RHSTuple >( rhs ) ) ) ...
-	  );
+	return ( std::invoke(
+		   std::forward< F >( f ),
+		   std::get< I >( std::forward< LHSTuple >( lhs ) ),
+		   std::get< I >( std::forward< RHSTuple >( rhs ) ) ), ... );
       }
     } // end of namespace 'detail'.
 
@@ -67,7 +66,11 @@ namespace cxx
     constexpr decltype( auto )
     apply( F && f, LHSTuple && lhs, RHSTuple && rhs )
     {
-      static_assert( std::tuple_size_v< RHSTuple > >= std::tuple_size_v< LHSTuple > );
+      static_assert(
+	std::tuple_size_v< std::remove_reference_t< RHSTuple > >
+	>=
+	std::tuple_size_v< std::remove_reference_t< LHSTuple > >
+	);
 
       return detail::apply_impl(
 	std::forward< F >( f ),
