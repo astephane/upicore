@@ -58,7 +58,6 @@ namespace pipeline
 	  this->data
 	  );
     }
-
   };
 
 } // end of namespace 'pipeline'.
