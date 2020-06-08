@@ -25,6 +25,7 @@
 namespace pipeline
 {
 
+
 #define IN_PROCESS_UPDATE_OUTPUT( name )	\
   void						\
   update_output_##name() override		\
