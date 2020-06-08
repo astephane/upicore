@@ -43,10 +43,10 @@ image_pipeline()
 #if 0
   pipeline::process_interface * process = &ifw;
 
-  process->update_output_information();
+  process->update_output_info();
 
 #else
-  ifw.update_output_information();
+  ifw.update_output_info();
 
 #endif
 }
@@ -68,10 +68,10 @@ point_cloud_pipeline()
 #if 0
   pipeline::process_interface * process = &lfw;
 
-  process->update_output_information();
+  process->update_output_info();
 
 #else
-  lfw.update_output_information();
+  lfw.update_output_info();
 
 #endif
 }

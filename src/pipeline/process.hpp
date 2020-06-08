@@ -63,11 +63,11 @@ namespace pipeline
 	[ &primary_input ]( auto && port ) {
 	  // TRACE_FUN();
 
-	  std::cout << "out_process::generate_output_information()" << std::endl;
+	  std::cout << "out_process::generate_output_info()" << std::endl;
 
 	  assert( port );
 
-	  port->data.set_information( primary_input->data.information() );
+	  port->data.set_info( primary_input->data.info() );
 	}
 	);
     }

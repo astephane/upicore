@@ -31,23 +31,23 @@
 
 struct foo : public pipeline::data
 {
-  void set_information( int )
+  void set_info( int )
   {
     TRACE_THIS_FUN();
   }
 
-  int information() const { return -1; }
+  int info() const { return -1; }
 };
 
 
 struct image : public pipeline::data
 {
-  void set_information( int )
+  void set_info( int )
   {
     TRACE_THIS_FUN();
   }
 
-  int information() const { return -1; }
+  int info() const { return -1; }
 };
 
 
@@ -81,12 +81,12 @@ struct ndvi_filter : public pipeline::process< pipeline::input< image, foo >,
 
 struct point_cloud : public pipeline::data
 {
-  void set_information( int )
+  void set_info( int )
   {
     TRACE_THIS_FUN();
   }
 
-  int information() const { return -1; }
+  int info() const { return -1; }
 };
 
 
