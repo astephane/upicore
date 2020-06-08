@@ -27,6 +27,7 @@ set( SOURCES
   pipeline/output.cpp
   pipeline/port.cpp
   pipeline/process.cpp
+  pipeline/tuple_data.cpp
   pipeline.cpp
   )
 
