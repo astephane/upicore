@@ -41,6 +41,30 @@ namespace pipeline
     this->in_process< Out >::update_output_##name();		\
   }
 
+/*
+#define PROCESS_GENERATE_OUTPUT( name )					\
+  void generate_output_##name() override				\
+  {									\
+    TRACE_THIS_FUN();							\
+									\
+    auto primary_input = this->in.primary().lock();			\
+									\
+    assert( primary_input );						\
+									\
+    this->out.downstream(						\
+      [ &primary_input ]( auto && port ) {				\
+									\
+	std::cout << "out_process::generate_output_" << #name << "()"	\
+		  << std::endl;						\
+									\
+	assert( port );							\
+									\
+	port->data = primary_input;					\
+      }									\
+      );								\
+  }
+*/
+
   template< typename In,
 	    typename Out >
   struct process : public in_process< Out >,
@@ -63,12 +87,28 @@ namespace pipeline
 	[ &primary_input ]( auto && port ) {
 	  // TRACE_FUN();
 
-	  std::cout << "out_process::generate_output_info()" << std::endl;
+	  std::cout << "process::generate_output_info()" << std::endl;
 
 	  assert( port );
 
 	  port->data.set_info( primary_input->data.info() );
 	}
+	);
+    }
+
+    void
+    generate_output_data() override
+    {
+      TRACE_THIS_FUN();
+
+      this->out.bar(
+	[]( auto && out_port, auto const & in_port ) {
+	  auto ip = in_port.lock();
+
+	  out_port->data =
+	    ip->data;
+	},
+	this->in
 	);
     }
   };
