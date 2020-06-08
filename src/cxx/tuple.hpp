@@ -18,7 +18,9 @@
 #define CXX_TUPLE_HPP
 
 
+#include <functional>
 #include <tuple>
+
 
 namespace cxx
 {
@@ -37,6 +39,42 @@ namespace cxx
 	  },
 	  t
 	  );
+    }
+
+    namespace detail
+    {
+      template< typename F,
+		typename LHSTuple,
+		typename RHSTuple,
+		std::size_t ... I >
+      constexpr decltype( auto )
+      apply_impl( F && f,
+		 LHSTuple && lhs,
+		 RHSTuple && rhs,
+		 std::index_sequence< I ... > )
+      {
+	return std::invoke(
+	  std::forward< F >( f ),
+	  ( std::get< I >( std::forward< LHSTuple >( lhs ) ),
+	    std::get< I >( std::forward< RHSTuple >( rhs ) ) ) ...
+	  );
+      }
+    } // end of namespace 'detail'.
+
+    template< typename F,
+	      typename LHSTuple,
+	      typename RHSTuple >
+    constexpr decltype( auto )
+    apply( F && f, LHSTuple && lhs, RHSTuple && rhs )
+    {
+      static_assert( std::tuple_size_v< RHSTuple > >= std::tuple_size_v< LHSTuple > );
+
+      return detail::apply_impl(
+	std::forward< F >( f ),
+	std::forward< LHSTuple >( lhs ),
+	std::forward< RHSTuple >( rhs ),
+	std::make_index_sequence< std::tuple_size_v< std::remove_reference_t< LHSTuple > > >{}
+	);
     }
   } // end of namespace 'tuple'.
 
