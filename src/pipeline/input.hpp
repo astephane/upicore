@@ -54,23 +54,6 @@ namespace pipeline
 	  );
     }
 
-    /*
-    void
-    update_output_info()
-    {
-      std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
-
-      upstream(
-	[]( auto && p ) {
-	  assert( p );
-	  assert( p->source );
-
-	  p->source->update_output_information();
-	}
-	);
-    }
-    */
-
   private:
     using value_type = std::tuple< std::weak_ptr< port< T > > ... >;
 
