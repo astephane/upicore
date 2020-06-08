@@ -71,8 +71,13 @@ point_cloud_pipeline()
   process->update_output_info();
 
 #else
+  std::cout << std::endl << "Querying information..." << std::endl;
   lfw.update_output_info();
 
+  std::cout << std::endl << "Processing data..." << std::endl;
+  lfw.update_output_data();
+
+  std::cout << std::endl << "DONE." << std::endl;
 #endif
 }
 
