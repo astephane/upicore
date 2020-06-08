@@ -52,7 +52,32 @@ namespace pipeline
 
     tuple_data() = default;
 
-  protected:
+    template< typename F,
+	      typename Tuple >
+    auto
+    foo( F && f, Tuple && tuple )
+    {
+      return cxx::tuple::apply(
+	std::forward( f ),
+	data,
+	std::forward( tuple )
+	);
+    }
+
+    template< typename F,
+	      template< typename > typename Pointer2,
+	      typename ... T2 >
+    auto
+    bar( F && f, tuple_data< Pointer2, T2 ... > const & td )
+    {
+      return cxx::tuple::apply(
+	std::forward< F >( f ),
+	data,
+	td.data
+	);
+    }
+
+  public:
     tuple_data( Pointer< port < T > > && ... e ) noexcept :
       data( e ... )
     {}
