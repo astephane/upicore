@@ -18,11 +18,7 @@
 #define PIPELINE_INPUT_HPP
 
 
-#include "cxx/tuple.hpp"
-#include "pipeline/port.hpp"
-
-#include <iostream>
-#include <memory>
+#include "pipeline/tuple_data.hpp"
 
 
 // https://stackoverflow.com/questions/47496358/c-lambdas-how-to-capture-variadic-parameter-pack-from-the-upper-scope
@@ -43,28 +39,8 @@ namespace pipeline
 {
 
   template< typename ... T >
-  struct input
+  struct input : public tuple_data< std::weak_ptr, T ... >
   {
-    template< std::size_t I >
-    auto &
-    get() noexcept
-    {
-      return std::get< I >( data );
-    }
-
-    template< std::size_t I >
-    auto const &
-    get() const noexcept
-    {
-      return std::get< I >( data );
-    }
-
-    auto const &
-    primary() const noexcept
-    {
-      return get< 0 >();
-    }
-
     template< typename F >
     auto
     upstream( F && f )
@@ -78,8 +54,9 @@ namespace pipeline
 	  );
     }
 
+    /*
     void
-    update_output_information()
+    update_output_info()
     {
       std::cout << typeid( this ).name() << "::upate_output_information()" << std::endl;
 
@@ -92,6 +69,7 @@ namespace pipeline
 	}
 	);
     }
+    */
 
   private:
     using value_type = std::tuple< std::weak_ptr< port< T > > ... >;

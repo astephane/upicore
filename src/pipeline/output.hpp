@@ -18,8 +18,7 @@
 #define PIPELINE_OUTPUT_HPP
 
 
-#include "cxx/tuple.hpp"
-#include "pipeline/port.hpp"
+#include "pipeline/tuple_data.hpp"
 
 #include <memory>
 
@@ -28,12 +27,12 @@ namespace pipeline
 {
 
   template< typename ... T >
-  struct output
+  struct output : public tuple_data< std::shared_ptr, T ... >
   {
     using source_pointer = port_interface::source_pointer;
 
     output( source_pointer p ) :
-      data( std::make_shared< port< T > >( p ) ...  )
+      tuple_data< std::shared_ptr, T ... >( std::make_shared< port< T > >( p ) ... )
     {}
 
     ~output()
@@ -43,29 +42,29 @@ namespace pipeline
 	  assert( port );
 	  port->source = nullptr;
 	},
-	data
+	this->data
 	);
     }
 
-    template< std::size_t I >
-    auto &
-    get() noexcept
-    {
-      return std::get< I >( data );
-    };
+    // template< std::size_t I >
+    // auto &
+    // get() noexcept
+    // {
+    //   return std::get< I >( data );
+    // };
 
-    template< std::size_t I >
-    auto const &
-    get() const noexcept
-    {
-      return std::get< I >( data );
-    };
+    // template< std::size_t I >
+    // auto const &
+    // get() const noexcept
+    // {
+    //   return std::get< I >( data );
+    // };
 
-    auto const &
-    primary() const noexcept
-    {
-      return get< 0 >();
-    }
+    // auto const &
+    // primary() const noexcept
+    // {
+    //   return get< 0 >();
+    // }
 
     template< typename F >
     auto
@@ -76,14 +75,10 @@ namespace pipeline
 	  [ &f ]( auto && port ) {
 	    f( port );
 	  },
-	  data
+	  this->data
 	  );
     }
 
-  private:
-    using value_type = std::tuple< std::shared_ptr< port< T > > ... >;
-
-    value_type data;
   };
 
 } // end of namespace 'pipeline'.
