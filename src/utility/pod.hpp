@@ -118,7 +118,9 @@ namespace utility
 	      std::size_t ... I >
     struct pod
     {
-      constexpr pod( std::index_sequence< I ... > ) noexcept;
+      constexpr pod( std::index_sequence< I ... > ) noexcept
+      {
+      }
 
       using value_type = std::tuple< typename Traits< static_cast< Enum >( I ) >::element_type ... >;
 
@@ -136,7 +138,7 @@ namespace utility
     // static_assert( std::is_pod_v< pod< Enum, Traits > > );
 
     pod() noexcept :
-      detail::pod< Enum, Traits >( std::make_index_sequence< Enum::cout >() )
+      detail::pod< Enum, Traits >( std::make_index_sequence< Enum::count >() )
     {
     }
 
