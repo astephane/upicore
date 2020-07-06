@@ -26,7 +26,7 @@ namespace pipeline
 {
 
 
-#define IN_PROCESS_UPDATE_OUTPUT( name )	\
+#define IN_PROCESS_GENERATE_OUTPUT( name )	\
   void						\
   update_output_##name() override		\
   {						\
@@ -44,8 +44,8 @@ namespace pipeline
   {
     in_process() : out( this ) {}
 
-    IN_PROCESS_UPDATE_OUTPUT( info );
-    IN_PROCESS_UPDATE_OUTPUT( data );
+    IN_PROCESS_GENEATE_OUTPUT( info );
+    IN_PROCESS_GENERATE_OUTPUT( data );
 
     Out out;
   };
