@@ -29,6 +29,7 @@ set( SOURCES
   pipeline/process.cpp
   pipeline/tuple_data.cpp
   pipeline.cpp
+  utility/pod.cpp
   )
 
 add_executable( ${PROJECT_NAME} ${SOURCES} )
