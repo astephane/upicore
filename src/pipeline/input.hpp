@@ -50,16 +50,13 @@ namespace pipeline
 	  [ &f ]( auto && p ) {
 	    f( p.lock() );
 	  },
-	  data
+	  this->data
 	  );
     }
-
-  private:
-    using value_type = std::tuple< std::weak_ptr< port< T > > ... >;
-
-    value_type data;
   };
 
-} // end of namespace 'pipeline'.
+  } // namespace experimental
+
+} // namespace pipeline.
 
 #endif // PIPELINE_INPUT_HPP
