@@ -20,49 +20,12 @@
 
 #include <type_traits>
 #include <stdexcept>
+#include <tuple>
+#include <utility>
 
 
 namespace utility
 {
-
-  enum class vector : int
-  {
-    x = 0,
-    y,
-    z,
-    //
-    count,
-    //
-    first = x,
-    last = z,
-  };
-
-
-  enum class color : int
-  {
-    r = 0,
-    g,
-    b,
-    a,
-    //
-    count,
-    //
-    first = r,
-    last = a,
-  };
-
-
-  enum class vertex : int
-  {
-    v,
-    n,
-    c,
-    //
-    count,
-    //
-    first = v,
-    last = c,
-  };
 
 
 #define DECLARE_ENUM_CLASS_TRAITS( enum_class, enum_class_traits )	\
@@ -101,38 +64,6 @@ namespace utility
       return elt_name;					\
     }							\
   };
-
-
-#define DEFINE_VECTOR_TRAIT( enum_value, elt_name, elt_type )		\
-  DEFINE_ENUM_CLASS_TRAIT( vector_traits, vector, enum_value, elt_name, elt_type )
-
-#define DEFINE_COLOR_TRAIT( enum_value, elt_name, elt_type )		\
-  DEFINE_ENUM_CLASS_TRAIT( color_traits, color, enum_value, elt_name, elt_type )
-
-#define DEFINE_VERTEX_TRAIT( enum_value, elt_name, elt_type )		\
-  DEFINE_ENUM_CLASS_TRAIT( vertex_traits, vertex, enum_value, elt_name, elt_type )
-
-
-  DECLARE_ENUM_CLASS_TRAITS( vector, vector_traits );
-
-  DEFINE_VECTOR_TRAIT( vector::x, "x", double );
-  DEFINE_VECTOR_TRAIT( vector::y, "y", double );
-  DEFINE_VECTOR_TRAIT( vector::z, "z", double );
-
-
-  DECLARE_ENUM_CLASS_TRAITS( color, color_traits );
-
-  DEFINE_COLOR_TRAIT( color::r, "r", std::uint8_t );
-  DEFINE_COLOR_TRAIT( color::g, "g", std::uint8_t );
-  DEFINE_COLOR_TRAIT( color::b, "b", std::uint8_t );
-  DEFINE_COLOR_TRAIT( color::a, "a", std::uint8_t );
-
-
-  DECLARE_ENUM_CLASS_TRAITS( vertex, vertex_traits );
-
-  DEFINE_VERTEX_TRAIT( vertex::v, "v", vector );
-  DEFINE_VERTEX_TRAIT( vertex::n, "n", vector );
-  DEFINE_VERTEX_TRAIT( vertex::c, "c", color );
 
 
 #define DECLARE_ENUM_CLASS_UNARY_EVALUATOR( enum_class, evaluator_name ) \
@@ -180,13 +111,123 @@ namespace utility
   }
 
 
-  template< typename EnumClassTraits >
-  struct pod
+  namespace detail
   {
-    static_assert( std::is_enum_v< typename EnumClassTraits::value_type > );
-    static_assert( std::is_pod_v< pod< EnumClassTraits > > );
+    template< typename Enum,
+	      template< Enum > typename Traits,
+	      std::size_t ... I >
+    struct pod
+    {
+      constexpr pod( std::index_sequence< I ... > ) noexcept;
+
+      using value_type = std::tuple< typename Traits< static_cast< Enum >( I ) >::element_type ... >;
+
+      value_type data;
+    };
+
+  } // namespace detail
+
+
+  template< typename Enum,
+	    template< Enum > typename Traits >
+  struct pod : public detail::pod< Enum, Traits >
+  {
+    static_assert( std::is_enum_v< Enum > );
+    // static_assert( std::is_pod_v< pod< Enum, Traits > > );
+
+    pod() noexcept :
+      detail::pod< Enum, Traits >( std::make_index_sequence< Enum::cout >() )
+    {
+    }
+
+    template< Enum E >
+    auto const &
+    get() const
+    {
+      return
+	std::get< static_cast< std::underlying_type_t< Enum > >( E ) >( this->data );
+    }
   };
 
 } // namespace utility
+
+
+namespace sample_pod
+{
+
+  enum class vector : int
+  {
+    x = 0,
+    y,
+    z,
+    //
+    count,
+    //
+    first = x,
+    last = z,
+  };
+
+
+  enum class color : int
+  {
+    r = 0,
+    g,
+    b,
+    a,
+    //
+    count,
+    //
+    first = r,
+    last = a,
+  };
+
+
+  enum class vertex : int
+  {
+    v,
+    n,
+    c,
+    //
+    count,
+    //
+    first = v,
+    last = c,
+  };
+
+
+#define DEFINE_VECTOR_TRAIT( enum_value, elt_name, elt_type )		\
+  DEFINE_ENUM_CLASS_TRAIT( vector_traits, vector, enum_value, elt_name, elt_type )
+
+#define DEFINE_COLOR_TRAIT( enum_value, elt_name, elt_type )		\
+  DEFINE_ENUM_CLASS_TRAIT( color_traits, color, enum_value, elt_name, elt_type )
+
+#define DEFINE_VERTEX_TRAIT( enum_value, elt_name, elt_type )		\
+  DEFINE_ENUM_CLASS_TRAIT( vertex_traits, vertex, enum_value, elt_name, elt_type )
+
+
+  DECLARE_ENUM_CLASS_TRAITS( vector, vector_traits );
+
+  DEFINE_VECTOR_TRAIT( vector::x, "x", double );
+  DEFINE_VECTOR_TRAIT( vector::y, "y", double );
+  DEFINE_VECTOR_TRAIT( vector::z, "z", double );
+
+
+  DECLARE_ENUM_CLASS_TRAITS( color, color_traits );
+
+  DEFINE_COLOR_TRAIT( color::r, "r", std::uint8_t );
+  DEFINE_COLOR_TRAIT( color::g, "g", std::uint8_t );
+  DEFINE_COLOR_TRAIT( color::b, "b", std::uint8_t );
+  DEFINE_COLOR_TRAIT( color::a, "a", std::uint8_t );
+
+
+  DECLARE_ENUM_CLASS_TRAITS( vertex, vertex_traits );
+
+  DEFINE_VERTEX_TRAIT( vertex::v, "v", vector );
+  DEFINE_VERTEX_TRAIT( vertex::n, "n", vector );
+  DEFINE_VERTEX_TRAIT( vertex::c, "c", color );
+
+
+} // namespace sample_pod
+
 
 #endif // UTILITY_POD_HPP
