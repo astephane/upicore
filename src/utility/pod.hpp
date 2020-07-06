@@ -135,11 +135,56 @@ namespace utility
   DEFINE_VERTEX_TRAIT( vertex::c, "c", color );
 
 
-  template< typename T >
+#define DECLARE_ENUM_CLASS_UNARY_EVALUATOR( enum_class, evaluator_name ) \
+  									\
+  template< enum_class E,						\
+	    typename UnaryOp >						\
+  constexpr								\
+  auto									\
+  eval( UnaryOp unary_op ) noexcept					\
+  {									\
+    using underlying_type_t = std::underlying_type_t< position >;	\
+									\
+    return								\
+      static_cast< E >(							\
+  	unary_op(							\
+  	  static_cast< underlying_type_t >( P )				\
+  	  )								\
+  	);								\
+  }
+
+
+#define DECLARE_ENUM_CLASS_NEXT( enum_class )	\
+						\
+  template< enum_class E >			\
+  constexpr					\
+  auto						\
+  next() noexcept				\
+  {						\
+    return details::eval< E >(			\
+      []( auto p ) { return p + 1; }		\
+      );					\
+  }
+
+
+#define DECLARE_ENUM_CLASS_PREV( enum_class )	\
+						\
+  template< enum_class E >			\
+  constexpr					\
+  auto						\
+  prev() noexcept				\
+  {						\
+    return details::eval< E >(			\
+      []( auto p ) { return p - 1; }		\
+      );					\
+  }
+
+
+  template< typename EnumClassTraits >
   struct pod
   {
-    static_assert( std::is_enum_v< T > );
-    static_assert( std::is_pod_v< pod< T > > );
+    static_assert( std::is_enum_v< typename EnumClassTraits::value_type > );
+    static_assert( std::is_pod_v< pod< EnumClassTraits > > );
   };
 
 } // namespace utility
