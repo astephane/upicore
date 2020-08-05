@@ -125,13 +125,13 @@ namespace utility
 	      std::size_t ... I >
     struct pod
     {
-      constexpr pod( std::index_sequence< I ... > ) noexcept
+      constexpr pod( std::index_sequence< I ... > = std::index_sequence< I ... >{} ) noexcept
       {
       }
 
       using value_type = std::tuple< typename Traits< static_cast< Enum >( I ) >::element_type ... >;
 
-      value_type data;
+      // value_type data;
     };
 
   } // namespace detail
@@ -139,13 +139,14 @@ namespace utility
 
   template< typename Enum,
 	    template< Enum > typename Traits >
-  struct pod : public detail::pod< Enum, Traits >
+  struct pod // : public detail::pod< Enum, Traits >
   {
     static_assert( std::is_enum_v< Enum > );
     // static_assert( std::is_pod_v< pod< Enum, Traits > > );
 
-    pod() noexcept :
-      detail::pod< Enum, Traits >( std::make_index_sequence< Enum::count >() )
+    using value_type = typename detail::pod< Enum, Traits >::value_type;
+
+    pod() noexcept // : detail::pod< Enum, Traits >( std::make_index_sequence< size< Enum >() >() )
     {
     }
 
@@ -158,6 +159,8 @@ namespace utility
 	std::get< static_cast< std::underlying_type_t< Enum > >( E ) >( this->data );
     }
 #endif
+
+    value_type data;
   };
 
 } // namespace utility

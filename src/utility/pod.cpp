@@ -48,6 +48,7 @@ template< typename Enum,
 struct make
 {
   template< typename ... Args >
+  static
   auto
   pod( Args && ... args )
   {
