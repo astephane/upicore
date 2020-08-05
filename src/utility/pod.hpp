@@ -112,6 +112,13 @@ namespace utility
 
 
   template< typename Enum >
+  constexpr std::size_t index( Enum e ) noexcept
+  {
+    return std::underlying_type_t< Enum >( e );
+  }
+
+
+  template< typename Enum >
   constexpr std::size_t size() noexcept
   {
     return static_cast< std::size_t >( Enum::count );
@@ -150,15 +157,12 @@ namespace utility
     {
     }
 
-#if 0
     template< Enum E >
     auto const &
     get() const
     {
-      return
-	std::get< static_cast< std::underlying_type_t< Enum > >( E ) >( this->data );
+      return std::get< index< Enum >( E ) >( data );
     }
-#endif
 
     value_type data;
   };

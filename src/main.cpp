@@ -95,7 +95,7 @@ main( int unused( argc ), char * unused( argv )[] )
 
     vector_type v;
 
-    // std::cout << v.get< sample_pod::vector::x >() << std::endl;
+    std::cout << v.get< sample_pod::vector::x >() << std::endl;
   }
 
   return EXIT_SUCCESS;
