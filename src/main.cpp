@@ -20,6 +20,8 @@
 
 #include "pipeline.hpp"
 
+#include "utility/pod.hpp"
+
 
 #define unused( x )
 
@@ -87,6 +89,14 @@ main( int unused( argc ), char * unused( argv )[] )
 {
   // image_pipeline();
   point_cloud_pipeline();
+
+  {
+    using vector_type = utility::pod< sample_pod::vector, sample_pod::vector_traits >;
+
+    vector_type v;
+
+    // std::cout << v.get< sample_pod::vector::x >() << std::endl;
+  }
 
   return EXIT_SUCCESS;
 }
