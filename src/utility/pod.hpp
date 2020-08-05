@@ -111,6 +111,13 @@ namespace utility
   }
 
 
+  template< typename Enum >
+  constexpr std::size_t size() noexcept
+  {
+    return static_cast< std::size_t >( Enum::count );
+  }
+
+
   namespace detail
   {
     template< typename Enum,
@@ -142,6 +149,7 @@ namespace utility
     {
     }
 
+#if 0
     template< Enum E >
     auto const &
     get() const
@@ -149,6 +157,7 @@ namespace utility
       return
 	std::get< static_cast< std::underlying_type_t< Enum > >( E ) >( this->data );
     }
+#endif
   };
 
 } // namespace utility
