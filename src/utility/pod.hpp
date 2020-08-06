@@ -24,9 +24,6 @@
 #include <utility>
 
 
-#define TEST_MAKE_TUPLE 0
-
-
 namespace utility
 {
 
@@ -137,8 +134,6 @@ namespace utility
   namespace detail
   {
 
-#if !TEST_MAKE_TUPLE
-
     /** */
     template< typename Enum,
 	      template< Enum > typename Traits,
@@ -152,8 +147,6 @@ namespace utility
 	    >::element_type ...
 	>();
     }
-
-#endif // !TEST_MAKE_TUPLE
 
 
     /** */
@@ -174,8 +167,6 @@ namespace utility
   } // namespace detail
 
 
-#if !TEST_MAKE_TUPLE
-
   /** */
   template< typename Enum,
 	    template< Enum > typename Traits,
@@ -186,8 +177,6 @@ namespace utility
   {
     return detail::make_pod_tuple< Enum, Traits >( Indices{} );
   }
-
-#endif // !TEST_MAKE_TUPLE
 
 
   /** */
@@ -218,16 +207,6 @@ namespace utility
       }
 
       using value_type = std::tuple< typename Traits< static_cast< Enum >( I ) >::element_type ... >;
-
-      template< Enum E >
-      static
-      auto const &
-      get( value_type const & data ) noexcept
-      {
-	return std::get< index( E ) >( data );
-      }
-
-      value_type data;
     };
 
 
@@ -245,9 +224,10 @@ namespace utility
   } // namespace detail
 
 
+  /** */
   template< typename Enum,
 	    template< Enum > typename Traits >
-  class pod // : public detail::pod< Enum, Traits >
+  class pod
   {
     static_assert( std::is_enum_v< Enum > );
     // static_assert( std::is_pod_v< pod< Enum, Traits > > );
@@ -255,7 +235,6 @@ namespace utility
     using indices = std::make_index_sequence< count< Enum >() >;
 
     using detail_pod = decltype( detail::dummy_pod< Enum, Traits >( indices() ) );
-    // using bar = typename foo::value_type;
 
   public:
     using value_type = typename detail_pod::value_type;
@@ -268,7 +247,6 @@ namespace utility
     auto const &
     get() const noexcept
     {
-      // return detail::pod< Enum, Traits >::get< E >( data );
       return std::get< index( E ) >( data );
     }
 
@@ -276,7 +254,6 @@ namespace utility
     auto &
     get() noexcept
     {
-      // return detail::pod< Enum, Traits >::get< E >( data );
       return std::get< index( E ) >( data );
     }
 
