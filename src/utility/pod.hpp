@@ -39,9 +39,15 @@ namespace utility
 									\
     static constexpr char const * name()				\
     {									\
-      throw std::domain_error( "unexpected '" #enum_class "' enum-class value." ); \
+      throw std::domain_error(						\
+	"unexpected '" #enum_class "' enum-class value." );		\
     }									\
-  };
+									\
+    static constexpr std::underlying_type_t< enum_class > index() noexcept \
+    {									\
+      return static_cast< std::underlying_type_t< enum_class > >( E );	\
+    }									\
+  }
 
 
 #define DEFINE_ENUM_CLASS_TRAIT( enum_class_traits,	\
@@ -63,7 +69,7 @@ namespace utility
     {							\
       return elt_name;					\
     }							\
-  };
+  }
 
 
 #define DECLARE_ENUM_CLASS_UNARY_EVALUATOR( enum_class, evaluator_name ) \
@@ -119,7 +125,7 @@ namespace utility
 
 
   template< typename Enum >
-  constexpr std::size_t size() noexcept
+  constexpr std::size_t count() noexcept
   {
     return static_cast< std::size_t >( Enum::count );
   }
@@ -132,13 +138,28 @@ namespace utility
 	      std::size_t ... I >
     struct pod
     {
-      constexpr pod( std::index_sequence< I ... > = std::index_sequence< I ... >{} ) noexcept
+      constexpr pod( std::index_sequence< I ... > ) noexcept
       {
       }
 
+      static constexpr auto dummy( std::index_sequence< I ... > indices ) noexcept
+      {
+	return pod( indices );
+      }
+
+      using this_type = decltype( dummy() );
+
       using value_type = std::tuple< typename Traits< static_cast< Enum >( I ) >::element_type ... >;
 
-      // value_type data;
+      template< Enum E >
+      static
+      auto const &
+      get( value_type const & data ) noexcept
+      {
+	return std::get< index( E ) >( data );
+      }
+
+      value_type data;
     };
 
   } // namespace detail
@@ -151,17 +172,27 @@ namespace utility
     static_assert( std::is_enum_v< Enum > );
     // static_assert( std::is_pod_v< pod< Enum, Traits > > );
 
+    using indices = std::make_index_sequence< count< Enum >() >;
+
+    // constexpr auto dummy() noexcept
+    // {
+    //   return detail::pod< Enum, Traits >::pod( indices {} );
+    // }
+
+    using foo = decltype( detail::pod< Enum, Traits >::dummy( indices {} ) );
+    // using bar = typename foo::value_type;
+
     using value_type = typename detail::pod< Enum, Traits >::value_type;
 
-    pod() noexcept // : detail::pod< Enum, Traits >( std::make_index_sequence< size< Enum >() >() )
+    pod() noexcept // : detail::pod< Enum, Traits >( std::make_index_sequence< count< Enum >() >() )
     {
     }
 
     template< Enum E >
     auto const &
-    get() const
+    get() const noexcept
     {
-      return std::get< index< Enum >( E ) >( data );
+      // return detail::pod< Enum, Traits >::get< E >( data );
     }
 
     value_type data;
