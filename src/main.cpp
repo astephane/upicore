@@ -91,11 +91,11 @@ main( int unused( argc ), char * unused( argv )[] )
   point_cloud_pipeline();
 
   {
-    using vector_type = utility::pod< sample_pod::vector, sample_pod::vector_traits >;
-    using color_type = utility::pod< sample_pod::color, sample_pod::color_traits >;
-    using vertex_type = utility::pod< sample_pod::vertex, sample_pod::vertex_traits >;
+    using vector = utility::pod< sample_pod::vector, sample_pod::vector_traits >;
+    using color = utility::pod< sample_pod::color, sample_pod::color_traits >;
+    using vertex = utility::pod< sample_pod::vertex, sample_pod::vertex_traits >;
 
-    vector_type v;
+    vector v;
 
     std::cout << v.get< sample_pod::vector::x >() << std::endl;
     std::cout << v.get< sample_pod::vector::y >() << std::endl;
