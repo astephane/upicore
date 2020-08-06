@@ -34,17 +34,17 @@ namespace detail
 
 template< typename Enum,
 	  template< Enum > typename Traits,
-	  typename Indices = std::make_index_sequence< utility::size< Enum >() > >
+	  typename Indices = std::make_index_sequence< utility::count< Enum >() > >
 auto
 make_pod()
 {
-  return detail::make_pod( Indices{} );
+  return detail::make_pod< Enum, Traits >( Indices{} );
 }
 
 
 template< typename Enum,
 	  template< Enum > typename Traits,
-	  typename Indices = std::make_index_sequence< utility::size< Enum >() > >
+	  typename Indices = std::make_index_sequence< utility::count< Enum >() > >
 struct make
 {
   template< typename ... Args >
@@ -60,5 +60,5 @@ namespace sample_pod
 {
 
   auto foo = make< vector, vector_traits >::pod( 0.0, 0.0, 0.0 );
-
+  auto bar = make< vector, vector_traits >::pod();
 } // namespace sample_pod
