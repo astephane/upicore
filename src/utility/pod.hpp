@@ -24,6 +24,9 @@
 #include <utility>
 
 
+#define TEST_MAKE_TUPLE 0
+
+
 namespace utility
 {
 
@@ -133,21 +136,86 @@ namespace utility
 
   namespace detail
   {
+
+#if !TEST_MAKE_TUPLE
+
+    /** */
+    template< typename Enum,
+	      template< Enum > typename Traits,
+	      std::size_t ... I >
+    auto make_pod_tuple( std::index_sequence< I ... > )
+    {
+      return
+	std::tuple<
+	  typename Traits<
+	    static_cast< Enum >( I )
+	    >::element_type ...
+	>();
+    }
+
+#endif // !TEST_MAKE_TUPLE
+
+
+    /** */
+    template< typename Enum,
+	      template< Enum > typename Traits,
+	      typename ... Args,
+	      std::size_t ... I >
+    auto make_pod_tuple( std::index_sequence< I ... >, Args && ... args )
+    {
+      return
+	std::tuple<
+	  typename Traits<
+	    static_cast< Enum >( I )
+	    >::element_type ...
+	>( args ... );
+    }
+
+  } // namespace detail
+
+
+#if !TEST_MAKE_TUPLE
+
+  /** */
+  template< typename Enum,
+	    template< Enum > typename Traits,
+	    typename Indices = std::make_index_sequence< utility::count< Enum >() > >
+  constexpr
+  auto
+  make_pod_tuple()
+  {
+    return detail::make_pod_tuple< Enum, Traits >( Indices{} );
+  }
+
+#endif // !TEST_MAKE_TUPLE
+
+
+  /** */
+  template< typename Enum,
+	    template< Enum > typename Traits,
+	    typename Indices = std::make_index_sequence< utility::count< Enum >() >,
+	    typename ... Args >
+  constexpr
+  auto
+  make_pod_tuple( Args && ... args )
+  {
+    return detail::make_pod_tuple< Enum, Traits >( Indices{}, args ... );
+  }
+
+
+  namespace detail
+  {
+    /** */
     template< typename Enum,
 	      template< Enum > typename Traits,
 	      std::size_t ... I >
     struct pod
     {
+      using this_type = pod< Enum, Traits, I ... >;
+
       constexpr pod( std::index_sequence< I ... > ) noexcept
       {
       }
-
-      static constexpr auto dummy( std::index_sequence< I ... > indices ) noexcept
-      {
-	return pod( indices );
-      }
-
-      using this_type = decltype( dummy() );
 
       using value_type = std::tuple< typename Traits< static_cast< Enum >( I ) >::element_type ... >;
 
@@ -162,37 +230,54 @@ namespace utility
       value_type data;
     };
 
+
+    /** */
+    template< typename Enum,
+	      template< Enum > typename Traits,
+	      std::size_t ... I >
+    constexpr
+    pod< Enum, Traits, I ... >
+    dummy_pod( std::index_sequence< I ... > indices ) noexcept
+    {
+      return pod< Enum, Traits, I ... >::pod( indices );
+    }
+
   } // namespace detail
 
 
   template< typename Enum,
 	    template< Enum > typename Traits >
-  struct pod // : public detail::pod< Enum, Traits >
+  class pod // : public detail::pod< Enum, Traits >
   {
     static_assert( std::is_enum_v< Enum > );
     // static_assert( std::is_pod_v< pod< Enum, Traits > > );
 
     using indices = std::make_index_sequence< count< Enum >() >;
 
-    // constexpr auto dummy() noexcept
-    // {
-    //   return detail::pod< Enum, Traits >::pod( indices {} );
-    // }
-
-    using foo = decltype( detail::pod< Enum, Traits >::dummy( indices {} ) );
+    using detail_pod = decltype( detail::dummy_pod< Enum, Traits >( indices() ) );
     // using bar = typename foo::value_type;
 
-    using value_type = typename detail::pod< Enum, Traits >::value_type;
+  public:
+    using value_type = typename detail_pod::value_type;
+    using enum_type = Enum;
 
-    pod() noexcept // : detail::pod< Enum, Traits >( std::make_index_sequence< count< Enum >() >() )
-    {
-    }
+    template< Enum E >
+    using traits_type = Traits< E >;
 
     template< Enum E >
     auto const &
     get() const noexcept
     {
       // return detail::pod< Enum, Traits >::get< E >( data );
+      return std::get< index( E ) >( data );
+    }
+
+    template< Enum E >
+    auto &
+    get() noexcept
+    {
+      // return detail::pod< Enum, Traits >::get< E >( data );
+      return std::get< index( E ) >( data );
     }
 
     value_type data;
