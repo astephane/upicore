@@ -92,10 +92,14 @@ main( int unused( argc ), char * unused( argv )[] )
 
   {
     using vector_type = utility::pod< sample_pod::vector, sample_pod::vector_traits >;
+    using color_type = utility::pod< sample_pod::color, sample_pod::color_traits >;
+    using vertex_type = utility::pod< sample_pod::vertex, sample_pod::vertex_traits >;
 
     vector_type v;
 
     std::cout << v.get< sample_pod::vector::x >() << std::endl;
+    std::cout << v.get< sample_pod::vector::y >() << std::endl;
+    std::cout << v.get< sample_pod::vector::z >() << std::endl;
   }
 
   return EXIT_SUCCESS;
